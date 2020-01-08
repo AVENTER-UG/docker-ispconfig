@@ -24,20 +24,38 @@ FROM ubuntu:18.04
 
 MAINTAINER Andreas Peters <support@aventer.biz> version: 0.1
 
+
+ENV isp_mysql_hostname localhost
+ENV isp_mysql_root_password default
+ENV isp_mysql_ispconfig_password default
+ENV isp_mysql_master_root_password default
+ENV isp_mysql_master_hostname localhost
+ENV isp_admin_password default
+ENV isp_enable_mail n
+ENV isp_enable_jailkit n
+ENV isp_enable_ftp n
+ENV isp_enable_dns y
+ENV isp_enable_apache y
+ENV isp_enable_nginx y
+ENV isp_enable_firewall y
+ENV isp_enable_webinterface y
+ENV isp_enable_multiserver n
+ENV isp_hostname localhost
+ENV isp_use_ssl y
+
 RUN apt-get -y update && apt-get -y upgrade
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get -y update && apt-get -y upgrade && apt-get -y install rsyslog rsyslog-relp logrotate supervisor screenfetch nano apt-utils gettext-base
+RUN apt-get -y update && apt-get -y upgrade && apt-get -y install wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base
 
 # Remove sendmail
 RUN echo -n "Removing Sendmail... "	service sendmail stop hide_output update-rc.d -f sendmail remove apt_remove sendmail
 
-# Install Postfix, Dovecot, MySQL-Client, rkhunter, binutils
+# Install Postfix, Dovecot, rkhunter, binutils
 RUN echo -n "Installing SMTP Mail server (Postfix)... " \
 && echo "postfix postfix/main_mailer_type select Internet Site" | debconf-set-selections \
 && echo "postfix postfix/mailname string contato@seusite.con.br" | debconf-set-selections
-RUN apt-get -y install mysql-client postfix postfix-mysql postfix-doc openssl getmail4 rkhunter binutils dovecot-imapd dovecot-pop3d dovecot-mysql dovecot-sieve dovecot-lmtpd sudo
+RUN apt-get -y install postfix mysql-client postfix-mysql postfix-doc openssl getmail4 rkhunter binutils dovecot-imapd dovecot-pop3d dovecot-mysql dovecot-sieve dovecot-lmtpd sudo
 ADD ./etc/postfix/master.cf /etc/postfix/master.cf
-# RUN apt-get -y install expect
 ADD ./etc/security/limits.conf /etc/security/limits.conf
 
 # Install Amavisd-new, SpamAssassin And Clamav
@@ -86,14 +104,25 @@ ADD ./etc/fail2ban/filter.d/pureftpd.conf /etc/fail2ban/filter.d/pureftpd.conf
 ADD ./etc/fail2ban/filter.d/dovecot-pop3imap.conf /etc/fail2ban/filter.d/dovecot-pop3imap.conf
 RUN echo "ignoreregex =" >> /etc/fail2ban/filter.d/postfix-sasl.conf
 
+# Install Let's Encrypt
+RUN apt-get -y install python-certbot-apache
+
 # UFW firewall
 RUN apt-get install ufw
+
+# ISPCONFIG Initialization and Startup Script
+ADD ./wait-for-it.sh /wait-for-it.sh
+ADD ./autoinstall.ini /root/autoinstall.ini
+ADD ./start.sh /start.sh
+ADD ./supervisord.conf /etc/supervisor/supervisord.conf
+ADD ./etc/cron.daily/sql_backup.sh /etc/cron.daily/sql_backup.sh
 
 # Install ISPConfig 3
 RUN cd /tmp \
 && wget -O ISPConfig.tgz https://ispconfig.org/downloads/ISPConfig-3.1.15p2.tar.gz \
 && tar xfz ISPConfig.tgz
 
+ADD ./update.php /tmp/ispconfig3_install/install/update.php
 ADD ./install.php /tmp/ispconfig3_install/install/install.php
 
 ADD ./etc/postfix/master.cf /etc/postfix/master.cf
@@ -103,11 +132,7 @@ RUN echo "export TERM=xterm" >> /root/.bashrc
 
 EXPOSE 53 80/tcp 443/tcp 953/tcp 8080/tcp 30000 30001 30002 30003 30004 30005 30006 30007 30008 30009 3306
 
-# ISPCONFIG Initialization and Startup Script
-ADD ./autoinstall.ini /root/autoinstall.ini
-ADD ./start.sh /start.sh
-ADD ./supervisord.conf /etc/supervisor/supervisord.conf
-ADD ./etc/cron.daily/sql_backup.sh /etc/cron.daily/sql_backup.sh
+
 
 RUN chmod 755 /start.sh
 RUN mkdir -p /var/run/sshd
@@ -117,7 +142,6 @@ RUN mkdir -p /var/backup/sql
 
 RUN ln -s /dev/random /root/.rnd
 
-# Must use double quotes for json formatting.
-CMD ["/usr/bin/supervisord", "--configuration=/etc/supervisor/supervisord.conf"]
+VOLUME ["/usr/local/ispconfig/"]
 
 CMD ["/bin/bash", "/start.sh"]
