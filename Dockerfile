@@ -140,7 +140,7 @@ RUN mkdir -p /var/log/supervisor
 ADD ./bin/systemctl /bin/systemctl
 RUN mkdir -p /var/backup/sql
 
-RUN ln -s /dev/random /root/.rnd
+RUN ln -s /dev/urandom /root/.rnd
 
 VOLUME ["/usr/local/ispconfig/"]
 
