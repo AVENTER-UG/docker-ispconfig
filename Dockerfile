@@ -44,16 +44,26 @@ ENV isp_hostname localhost
 ENV isp_cert_hostname localhost
 ENV isp_use_ssl y
 
+ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get -y update && apt-get -y upgrade
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get -y update && apt-get -y upgrade && apt-get -y install wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base
+RUN apt-get -y update && apt-get -y upgrade && apt-get -y install quota mysql-client wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base
 
 # Remove sendmail
 RUN echo -n "Removing Sendmail... "	service sendmail stop hide_output update-rc.d -f sendmail remove apt_remove sendmail
 
 # Install Postfix, Dovecot, rkhunter, binutils
 RUN echo -n "Installing SMTP Mail server (Postfix)... " \
-RUN apt-get -y install postfix mysql-client postfix-mysql postfix-doc openssl getmail4 rkhunter binutils courier-authdaemon courier-authlib-mysql courier-base courier-pop courier-pop-ssl courier-imap courier-imap-ssl libsasl2-2 libsasl2-modules libsasl2-modules-sql sasl2-bin libpam-mysql sudo
+RUN apt-get install -y courier-authdaemon courier-authlib courier-authlib-userdb 
+# workaround courier install bug
+RUN touch /usr/share/man/man5/maildir.courier.5.gz  \
+    && touch /usr/share/man/man8/deliverquota.courier.8.gz \
+    && touch /usr/share/man/man1/maildirmake.courier.1.gz \
+    && touch /usr/share/man/man7/maildirquota.courier.7.gz \
+    && touch /usr/share/man/man1/makedat.courier.1.gz \
+    && ls -l /usr/share/man/man7/ \
+    && apt-get -y install courier-base
+
+RUN apt-get -y install postfix mysql-client postfix-mysql postfix-doc openssl getmail4 rkhunter binutils courier-authlib-mysql courier-pop courier-pop-ssl courier-imap courier-imap-ssl libsasl2-2 libsasl2-modules libsasl2-modules-sql sasl2-bin libpam-mysql sudo
 ADD ./etc/postfix/master.cf /etc/postfix/master.cf
 ADD ./etc/security/limits.conf /etc/security/limits.conf
 
