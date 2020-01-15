@@ -41,6 +41,7 @@ ENV isp_enable_firewall y
 ENV isp_enable_webinterface y
 ENV isp_enable_multiserver n
 ENV isp_hostname localhost
+ENV isp_cert_hostname localhost
 ENV isp_use_ssl y
 
 RUN apt-get -y update && apt-get -y upgrade
@@ -52,9 +53,7 @@ RUN echo -n "Removing Sendmail... "	service sendmail stop hide_output update-rc.
 
 # Install Postfix, Dovecot, rkhunter, binutils
 RUN echo -n "Installing SMTP Mail server (Postfix)... " \
-&& echo "postfix postfix/main_mailer_type select Internet Site" | debconf-set-selections \
-&& echo "postfix postfix/mailname string contato@seusite.con.br" | debconf-set-selections
-RUN apt-get -y install postfix mysql-client postfix-mysql postfix-doc openssl getmail4 rkhunter binutils dovecot-imapd dovecot-pop3d dovecot-mysql dovecot-sieve dovecot-lmtpd sudo
+RUN apt-get -y install postfix mysql-client postfix-mysql postfix-doc openssl getmail4 rkhunter binutils courier-authdaemon courier-authlib-mysql courier-base courier-pop courier-pop-ssl courier-imap courier-imap-ssl libsasl2-2 libsasl2-modules libsasl2-modules-sql sasl2-bin libpam-mysql sudo
 ADD ./etc/postfix/master.cf /etc/postfix/master.cf
 ADD ./etc/security/limits.conf /etc/security/limits.conf
 
@@ -101,7 +100,10 @@ RUN cd /tmp \
 RUN apt-get -y install fail2ban
 ADD ./etc/fail2ban/jail.local /etc/fail2ban/jail.local
 ADD ./etc/fail2ban/filter.d/pureftpd.conf /etc/fail2ban/filter.d/pureftpd.conf
-ADD ./etc/fail2ban/filter.d/dovecot-pop3imap.conf /etc/fail2ban/filter.d/dovecot-pop3imap.conf
+ADD ./etc/fail2ban/filter.d/courierpop3.conf /etc/fail2ban/filter.d/courierpop3.conf
+ADD ./etc/fail2ban/filter.d/courierpop3s.conf /etc/fail2ban/filter.d/courierpop3s.conf
+ADD ./etc/fail2ban/filter.d/courierimap.conf /etc/fail2ban/filter.d/courierimap.conf
+ADD ./etc/fail2ban/filter.d/courierimaps.conf /etc/fail2ban/filter.d/courierimaps.conf
 RUN echo "ignoreregex =" >> /etc/fail2ban/filter.d/postfix-sasl.conf
 
 # Install Let's Encrypt

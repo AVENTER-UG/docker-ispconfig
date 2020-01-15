@@ -2,6 +2,7 @@
 
 envsubst < /root/autoinstall.ini > /tmp/ispconfig3_install/install/autoinstall.ini
 
+sed -i "s/^hosts .*$/hosts = $isp_mysql_hostname/g" /etc/postfix/mysql-virtual_outgoing_bcc.cf
 
 cd /tmp/ispconfig3_install/install/
 
