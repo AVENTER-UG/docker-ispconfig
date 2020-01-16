@@ -24,6 +24,12 @@ chmod 770 /etc/courier/shared/index
 rm -rf /var/run/saslauthd
 ln -sfn /var/spool/postfix/var/run/saslauthd /var/run/saslauthd
 
+# Workaround Markerline bug in courier
+cat /etc/courier/authmysqlrc >> /tmp/markerline
+cp /tmp/markerline /etc/courier/authmysqlrc
+
+
+
 screenfetch
 
 /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
