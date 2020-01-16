@@ -62,12 +62,18 @@ RUN touch /usr/share/man/man5/maildir.courier.5.gz  \
     && touch /usr/share/man/man1/makedat.courier.1.gz \
     && ls -l /usr/share/man/man7/ \
     && apt-get -y install courier-base
-
+      
+# Workaround maildrop install  bug
+RUN touch /usr/share/man/man5/maildir.maildrop.5.gz \
+    && touch /usr/share/man/man7/maildirquota.maildrop.7.gz \
+    && apt-get install -y maildrop
 
 RUN apt-get -y install postfix mysql-client postfix-mysql postfix-doc openssl getmail4 rkhunter binutils courier-authlib-mysql courier-pop courier-pop-ssl courier-imap courier-imap-ssl libsasl2-2 libsasl2-modules libsasl2-modules-sql sasl2-bin libpam-mysql sudo gamin
 ADD ./etc/postfix/master.cf /etc/postfix/master.cf
 ADD ./etc/security/limits.conf /etc/security/limits.conf
 ADD ./etc/courier/markerline /tmp/markerline
+RUN service postfix stop 
+RUN update-rc.d -f postfix remove 
 
 # Install Amavisd-new, SpamAssassin And Clamav
 RUN apt-get -y install amavisd-new spamassassin clamav clamav-daemon unzip bzip2 arj nomarch lzop cabextract apt-listchanges libnet-ldap-perl libauthen-sasl-perl clamav-docs daemon libio-string-perl libio-socket-ssl-perl libnet-ident-perl zip libnet-dns-perl postgrey
@@ -87,11 +93,15 @@ RUN apt-get -y install php7.2-opcache php-apcu
 # PHP-FPM
 RUN apt-get -y install php7.2-fpm
 RUN a2enmod actions proxy_fcgi alias 
-RUN service apache2 restart
+RUN service apache2 stop
+RUN update-rc.d -f apache2 remove
 
 # Install BIND DNS Server
 RUN apt-get -y install bind9 dnsutils haveged
 RUN service haveged start
+RUN service bind9 stop
+RUN update-rc.d -f bind9 remove
+
 
 # Install Vlogger, Webalizer, and AWStats
 RUN apt-get -y install vlogger webalizer awstats geoip-database libclass-dbi-mysql-perl
@@ -155,6 +165,8 @@ ADD ./bin/systemctl /bin/systemctl
 RUN mkdir -p /var/backup/sql
 
 RUN ln -s /dev/urandom /root/.rnd
+RUN rm -r /dev/random
+RUN ln -s /dev/urandom /dev/random
 
 VOLUME ["/usr/local/ispconfig/"]
 
