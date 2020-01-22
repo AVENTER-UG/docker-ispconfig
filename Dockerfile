@@ -98,6 +98,8 @@ RUN update-rc.d -f apache2 remove
 
 # Install BIND DNS Server
 RUN apt-get -y install bind9 dnsutils haveged
+# deactivate ipv6
+RUN sed -i 's/-u bind/-u bind -4/g' /etc/default/bind9
 RUN service haveged start
 RUN service bind9 stop
 RUN update-rc.d -f bind9 remove
@@ -122,11 +124,7 @@ RUN cd /tmp \
 RUN apt-get -y install fail2ban
 ADD ./etc/fail2ban/jail.local /etc/fail2ban/jail.local
 ADD ./etc/fail2ban/filter.d/pureftpd.conf /etc/fail2ban/filter.d/pureftpd.conf
-ADD ./etc/fail2ban/filter.d/courierpop3.conf /etc/fail2ban/filter.d/courierpop3.conf
-ADD ./etc/fail2ban/filter.d/courierpop3s.conf /etc/fail2ban/filter.d/courierpop3s.conf
-ADD ./etc/fail2ban/filter.d/courierimap.conf /etc/fail2ban/filter.d/courierimap.conf
-ADD ./etc/fail2ban/filter.d/courierimaps.conf /etc/fail2ban/filter.d/courierimaps.conf
-RUN echo "ignoreregex =" >> /etc/fail2ban/filter.d/postfix-sasl.conf
+ADD ./etc/fail2ban/filter.d/postfix-sasl.conf /etc/fail2ban/filter.d/postfix-sasl.conf
 
 # Install Let's Encrypt
 RUN apt-get -y install python-certbot-apache
@@ -165,8 +163,8 @@ ADD ./bin/systemctl /bin/systemctl
 RUN mkdir -p /var/backup/sql
 
 RUN ln -s /dev/urandom /root/.rnd
-RUN rm -r /dev/random
-RUN ln -s /dev/urandom /dev/random
+RUN rm -rf /dev/random \
+    && ln -s /dev/urandom /dev/random
 
 VOLUME ["/usr/local/ispconfig/"]
 

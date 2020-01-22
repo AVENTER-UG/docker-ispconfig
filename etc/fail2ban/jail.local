@@ -5,11 +5,12 @@ filter = pure-ftpd
 logpath = /var/log/syslog
 maxretry = 3
 
-[dovecot]
+[courier-auth]
 enabled = true
-filter = dovecot
+filter = courier-auth
 logpath = /var/log/mail.log
 maxretry = 5
+
 
 [postfix-sasl]
 enabled = true
