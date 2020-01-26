@@ -1,4 +1,6 @@
 [pure-ftpd]
+bantime=60m
+findtime=60m
 enabled = true
 port = ftp
 filter = pure-ftpd
@@ -6,15 +8,19 @@ logpath = /var/log/syslog
 maxretry = 3
 
 [courier-auth]
+bantime=60m
+findtime=60m
 enabled = true
 filter = courier-auth
 logpath = /var/log/mail.log
-maxretry = 5
-
+maxretry = 3
 
 [postfix-sasl]
+bantime=60m
+findtime=60m
 enabled = true
 port = smtp
 filter = postfix-sasl
 logpath = /var/log/mail.log
 maxretry = 3
+

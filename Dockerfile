@@ -73,16 +73,12 @@ ADD ./etc/postfix/master.cf /etc/postfix/master.cf
 ADD ./etc/security/limits.conf /etc/security/limits.conf
 ADD ./etc/courier/markerline /tmp/markerline
 RUN service postfix stop 
-RUN update-rc.d -f postfix remove 
 
 # Install Amavisd-new, SpamAssassin And Clamav
 RUN apt-get -y install amavisd-new spamassassin clamav clamav-daemon unzip bzip2 arj nomarch lzop cabextract apt-listchanges libnet-ldap-perl libauthen-sasl-perl clamav-docs daemon libio-string-perl libio-socket-ssl-perl libnet-ident-perl zip libnet-dns-perl postgrey
 ADD ./etc/clamav/clamd.conf /etc/clamav/clamd.conf
 RUN service spamassassin stop 
 RUN service clamav-daemon stop 
-RUN update-rc.d -f spamassassin remove
-RUN update-rc.d -f clamav-daemon remove
-
 # Install Apache2, PHP5, FCGI, suExec, Pear, And mcrypt
 RUN echo $(grep $(hostname) /etc/hosts | cut -f1) localhost >> /etc/hosts && apt-get -y install apache2 apache2-doc apache2-utils libapache2-mod-php php7.2 php7.2-common php7.2-gd php7.2-mysql php7.2-imap php7.2-cli php7.2-cgi libapache2-mod-fcgid apache2-suexec-pristine php-pear mcrypt  imagemagick libruby libapache2-mod-python php7.2-curl php7.2-intl php7.2-pspell php7.2-recode php7.2-sqlite3 php7.2-tidy php7.2-xmlrpc php7.2-xsl memcached php-memcache php-imagick php-gettext php7.2-zip php7.2-mbstring php-soap php7.2-soap
 RUN echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf && a2enconf servername
@@ -96,7 +92,6 @@ RUN apt-get -y install php7.2-opcache php-apcu
 RUN apt-get -y install php7.2-fpm
 RUN a2enmod actions proxy_fcgi alias 
 RUN service apache2 stop
-RUN update-rc.d -f apache2 remove
 
 # Install BIND DNS Server
 RUN apt-get -y install bind9 dnsutils haveged
@@ -104,7 +99,6 @@ RUN apt-get -y install bind9 dnsutils haveged
 RUN sed -i 's/-u bind/-u bind -4/g' /etc/default/bind9
 RUN service haveged start
 RUN service bind9 stop
-RUN update-rc.d -f bind9 remove
 
 
 # Install Vlogger, Webalizer, and AWStats
@@ -123,7 +117,7 @@ RUN cd /tmp \
 && rm -rf jailkit-2.19*
 
 # Install fail2ban
-RUN apt-get -y install fail2ban
+RUN apt-get -y install fail2ban 
 ADD ./etc/fail2ban/jail.local /etc/fail2ban/jail.local
 ADD ./etc/fail2ban/filter.d/pureftpd.conf /etc/fail2ban/filter.d/pureftpd.conf
 ADD ./etc/fail2ban/filter.d/postfix-sasl.conf /etc/fail2ban/filter.d/postfix-sasl.conf
@@ -146,7 +140,7 @@ RUN cd /tmp \
 && wget -O ISPConfig.tgz https://ispconfig.org/downloads/ISPConfig-3.1.15p2.tar.gz \
 && tar xfz ISPConfig.tgz
 
-ADD ./update.php /tmp/ispconfig3_install/install/update.php
+#ADD ./update.php /tmp/ispconfig3_install/install/update.php
 ADD ./install.php /tmp/ispconfig3_install/install/install.php
 
 ADD ./etc/postfix/master.cf /etc/postfix/master.cf
@@ -167,6 +161,8 @@ RUN mkdir -p /var/backup/sql
 RUN ln -s /dev/urandom /root/.rnd
 RUN rm -rf /dev/random \
     && ln -s /dev/urandom /dev/random
+
+RUN chmod 775 /var/log
 
 VOLUME ["/usr/local/ispconfig/"]
 

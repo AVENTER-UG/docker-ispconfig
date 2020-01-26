@@ -24,18 +24,20 @@ echo "FLUSH PRIVILEGES;" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root
 echo "ALTER TABLE dbispconfig.sys_user MODIFY passwort VARCHAR(140);"  | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
 
 
-chmod 770 /etc/courier/shared
+mkdir -p /etc/courier/shared/index
+chmod -R 770 /etc/courier/shared
 
 rm -rf /var/run/saslauthd
 ln -sfn /var/spool/postfix/var/run/saslauthd /var/run/saslauthd
 
 # Workaround Markerline bug in courier
-head /etc/courier/authmysqlrc >> /tmp/markerline
+tail -n 20 /etc/courier/authmysqlrc >> /tmp/markerline
 cp /tmp/markerline /etc/courier/authmysqlrc
 
 screenfetch
 
 /etc/init.d/courier-authdaemon start
+/etc/init.d/clamav-daemon start
 /etc/init.d/bind9 start
 
 /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
