@@ -45,7 +45,6 @@ ENV isp_cert_hostname localhost
 ENV isp_use_ssl y
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get -y update && apt-get -y upgrade
 RUN apt-get -y update && apt-get -y upgrade && apt-get -y install quota mysql-client wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base
 
 # Remove sendmail
@@ -71,7 +70,7 @@ RUN touch /usr/share/man/man5/maildir.maildrop.5.gz \
 RUN apt-get -y install postfix mysql-client postfix-mysql postfix-doc openssl getmail4 rkhunter binutils courier-authlib-mysql courier-pop courier-pop-ssl courier-imap courier-imap-ssl libsasl2-2 libsasl2-modules libsasl2-modules-sql sasl2-bin libpam-mysql sudo gamin
 ADD ./etc/postfix/master.cf /etc/postfix/master.cf
 ADD ./etc/security/limits.conf /etc/security/limits.conf
-ADD ./etc/courier/markerline /tmp/markerline
+ADD ./etc/courier/authmysqlrc.ini /root/authmysqlrc.ini
 RUN service postfix stop 
 
 # Install Amavisd-new, SpamAssassin And Clamav
@@ -140,7 +139,7 @@ RUN cd /tmp \
 && wget -O ISPConfig.tgz https://ispconfig.org/downloads/ISPConfig-3.1.15p2.tar.gz \
 && tar xfz ISPConfig.tgz
 
-#ADD ./update.php /tmp/ispconfig3_install/install/update.php
+ADD ./update.php /tmp/ispconfig3_install/install/update.php
 ADD ./install.php /tmp/ispconfig3_install/install/install.php
 
 ADD ./etc/postfix/master.cf /etc/postfix/master.cf
@@ -162,7 +161,10 @@ RUN ln -s /dev/urandom /root/.rnd
 RUN rm -rf /dev/random \
     && ln -s /dev/urandom /dev/random
 
-RUN chmod 775 /var/log
+RUN chmod 750 /var/log
+
+## logrotate woradounds
+ADD ./etc/logrotate/rsyslog-rotate /usr/lib/rsyslog/rsyslog-rotate 
 
 VOLUME ["/usr/local/ispconfig/"]
 

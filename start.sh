@@ -1,6 +1,7 @@
 #!/bin/bash
 
 envsubst < /root/autoinstall.ini > /tmp/ispconfig3_install/install/autoinstall.ini
+envsubst < /root/authmysqlrc.ini > /etc/courier/authmysqlrc
 
 echo $isp_hostname > /etc/mailname
 
@@ -30,14 +31,34 @@ chmod -R 770 /etc/courier/shared
 rm -rf /var/run/saslauthd
 ln -sfn /var/spool/postfix/var/run/saslauthd /var/run/saslauthd
 
-# Workaround Markerline bug in courier
-tail -n 20 /etc/courier/authmysqlrc >> /tmp/markerline
-cp /tmp/markerline /etc/courier/authmysqlrc
-
 screenfetch
 
-/etc/init.d/courier-authdaemon start
 /etc/init.d/clamav-daemon start
-/etc/init.d/bind9 start
+
+if [ "$isp_enable_mail" == "y" ];
+then
+  /etc/init.d/courier-authdaemon start
+fi
+
+if [ "$isp_enable_dns" == "y" ];
+then
+  /etc/init.d/bind9 start
+fi
+
+if [ "$isp_enable_nginx" == "y" ];
+then
+  /etc/init.d/php7.2-fpm start
+fi
+
+if [ "$isp_enable_apache" == "y" ];
+then
+  /etc/init.d/php7.2-fpm start
+fi
+
+unset isp_mysql_root_password
+unset isp_mysql_ispconfig_password
+unset isp_mysql_master_root_password
+unset isp_admin_password
+
 
 /usr/bin/supervisord -c /etc/supervisor/supervisord.conf

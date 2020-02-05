@@ -1,0 +1,4 @@
+#!/bin/sh
+
+ps -ef | grep rsyslogd | awk '{ print $2 }' | xargs kill
+/etc/init.d/rsyslog start
