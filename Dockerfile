@@ -161,7 +161,7 @@ RUN ln -s /dev/urandom /root/.rnd
 RUN rm -rf /dev/random \
     && ln -s /dev/urandom /dev/random
 
-RUN chmod 750 /var/log
+RUN chmod 755 /var/log
 
 ## logrotate woradounds
 ADD ./etc/logrotate/rsyslog-rotate /usr/lib/rsyslog/rsyslog-rotate 
