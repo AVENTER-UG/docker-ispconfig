@@ -77,8 +77,12 @@ Specialy the system authentication files makes only problems if you try to persi
 
 ## The idea behind
 
-The idea behind this images is the flexibility to move the whole ISPConfig Container, with the data, with the config, to a other server if you have to update or migrate the host system. Use this container as the "Real Server", and the Server where its running, just as a host system.
+The idea behind this images is the flexibility to move the whole ISPConfig Container, with the data, with the config, as is, to a other server if you have to update or migrate the host system. Use this container as the "Real Server", and the Server where its running, just as a host system. This image should give you a posibility to maintain and fix your whole ISPConfig infrastructure very fast.
 
 ## Multiuser Environment
 
 Yes its working! We are using it with weave.works and docker-compose. At the host system is dnsmasq to seperate the weave dns resolution from the external one and the one inside of the container.
+
+## What it is not
+
+It's definitly not a microservice. :-) So, you cannot recreate the running container like you want and to everytime. You need a downtime, and maybe you also have so cleanup a little bit after you restart the container.
