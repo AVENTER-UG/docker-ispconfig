@@ -28,6 +28,10 @@ RUN apt-get -y update && apt-get -y upgrade && apt-get -y install software-prope
 # Remove sendmail
 RUN echo -n "Removing Sendmail... "	service sendmail stop hide_output update-rc.d -f sendmail remove apt_remove sendmail
 
+# Install OpenSSH 
+RUN apt-get -y install ssh openssh-server rsync
+
+
 # Install Postfix, Dovecot, rkhunter, binutils
 RUN echo -n "Installing SMTP Mail server (Postfix)... " \
 RUN apt-get install -y courier-authdaemon courier-authlib courier-authlib-userdb 
@@ -39,6 +43,11 @@ RUN touch /usr/share/man/man5/maildir.courier.5.gz  \
     && touch /usr/share/man/man1/makedat.courier.1.gz \
     && ls -l /usr/share/man/man7/ \
     && apt-get -y install courier-base
+
+# Install PhpMyAdmin
+RUN echo 'phpmyadmin phpmyadmin/dbconfig-install boolean true' | debconf-set-selections
+RUN echo 'phpmyadmin phpmyadmin/mysql/admin-pass password pass' | debconf-set-selections
+RUN apt-get -y install phpmyadmin    
       
 # Workaround maildrop install  bug
 RUN touch /usr/share/man/man5/maildir.maildrop.5.gz \

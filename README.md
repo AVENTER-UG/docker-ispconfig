@@ -27,7 +27,7 @@ services:
     ports:
       - "443:443"
       - "80:80"
-    volumes: ["/data/amavis:/var/lib/amavis","/data/etc/amavis:/etc/amavis", "/data/letsencrypt:/etc/letsencrypt", "/data/etc/apache2/sites-available:/etc/apache2/sites-available", "/data/etc/apache2/sites-enabled:/etc/apache2/sites-enabled", "/data/www:/var/www/", "/data/backup:/var/backup/", "/data/usr:/usr/local/ispconfig", "/data/etc/cron.d:/etc/cron.d", "/data/etc/passwd:/etc/passwd", "/data/etc/group:/etc/group", "/data/etc/shadow:/etc/shadow", "/data/kis/bind:/etc/bind"]
+    volumes: ["/data/amavis:/var/lib/amavis","/data/etc/amavis:/etc/amavis", "/data/letsencrypt:/etc/letsencrypt", "/data/etc/apache2/sites-available:/etc/apache2/sites-available", "/data/etc/apache2/sites-enabled:/etc/apache2/sites-enabled", "/data/www:/var/www/", "/data/backup:/var/backup/", "/data/usr:/usr/local/ispconfig", "/data/etc/cron.d:/etc/cron.d", "/data/kis/bind:/etc/bind"]
     restart: always
     depends_on:
       - master
@@ -63,6 +63,17 @@ networks:
 ```
 
 Next, some words to say. If you will deploy a docker container with this image for the first time, it will not work if you persist already all the data (like above). First, just mount /var/backup inside of the container, start the container and then copy all the needed files/directories ONE TIME into the backup directory. Then shutdown the container, and persist the data like above with all the files you copied into the backup directory. Thats just a one time job. :-) Why you have to do it! As example, bind, amavis, postfix, all these packages have default files. If you persist from the beginging, the default files will not be there and the services will crash.
+
+## Persist Data
+
+There are some directories and files its easier if you don't persist them. As example:
+
+- /etc/passwd
+- /etc/shadow
+- /etc/group
+- /var/log/ispconfig
+
+Specialy the system authentication files makes only problems if you try to persist them. Docker cannot handle a group/useradd on mounted auth files. To recreate the web/client users from ispconfig, you have to login into the webinterface, go to "Configuration", there on "resync" and then resync the "Websites" on the container you restarted. Thats it!
 
 ## The idea behind
 
