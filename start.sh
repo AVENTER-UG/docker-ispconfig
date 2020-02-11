@@ -1,7 +1,6 @@
 #!/bin/bash
 
 envsubst < /root/autoinstall.ini > /tmp/ispconfig3_install/install/autoinstall.ini
-envsubst < /root/authmysqlrc.ini > /etc/courier/authmysqlrc
 
 echo $isp_hostname > /etc/mailname
 
@@ -24,6 +23,8 @@ echo "FLUSH PRIVILEGES;" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root
 # Bugfix ISPconfig mysql error
 echo "ALTER TABLE dbispconfig.sys_user MODIFY passwort VARCHAR(140);"  | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
 
+# Bugfix ISPconfig missing markerline
+envsubst < /root/authmysqlrc.ini > /etc/courier/authmysqlrc
 
 mkdir -p /etc/courier/shared/index
 chmod -R 770 /etc/courier/shared

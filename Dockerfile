@@ -1,28 +1,6 @@
-#
-#                    ##        .
-#              ## ## ##       ==
-#           ## ## ## ##      ===
-#       /""""""""""""""""\___/ ===
-#  ~~~ {~~ ~~~~ ~~~ ~~~~ ~~ ~ /  ===- ~~~
-#       \______ o          __/
-#         \    \        __/
-#          \____\______/
-#
-#          |          |
-#       __ |  __   __ | _  __   _
-#      /  \| /  \ /   |/  / _\ |
-#      \__/| \__/ \__ |\_ \__  |
-#
-#
-# Ubuntu 18.04, Apache, PHP, MySQL, PureFTPD, BIND, Postfix, Dovecot, Roundcube and ISPConfig 3.1
-#
-# Link Referência 
-# https://www.howtoforge.com/tutorial/perfect-server-ubuntu-18.04-with-apache-php-myqsl-pureftpd-bind-postfix-doveot-and-ispconfig/3/
-#
-
 FROM ubuntu:18.04
 
-MAINTAINER Andreas Peters <support@aventer.biz> version: 0.1
+MAINTAINER Andreas Peters <support@aventer.biz> version: 0.2
 
 
 ENV isp_mysql_hostname localhost
@@ -45,7 +23,7 @@ ENV isp_cert_hostname localhost
 ENV isp_use_ssl y
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get -y update && apt-get -y upgrade && apt-get -y install quota mysql-client wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base
+RUN apt-get -y update && apt-get -y upgrade && apt-get -y install software-properties-common quota mysql-client wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base
 
 # Remove sendmail
 RUN echo -n "Removing Sendmail... "	service sendmail stop hide_output update-rc.d -f sendmail remove apt_remove sendmail
@@ -78,7 +56,7 @@ RUN apt-get -y install amavisd-new spamassassin clamav clamav-daemon unzip bzip2
 ADD ./etc/clamav/clamd.conf /etc/clamav/clamd.conf
 RUN service spamassassin stop 
 RUN service clamav-daemon stop 
-# Install Apache2, PHP5, FCGI, suExec, Pear, And mcrypt
+# Install Apache2, PHP, FCGI, suExec, Pear, And mcrypt
 RUN echo $(grep $(hostname) /etc/hosts | cut -f1) localhost >> /etc/hosts && apt-get -y install apache2 apache2-doc apache2-utils libapache2-mod-php php7.2 php7.2-common php7.2-gd php7.2-mysql php7.2-imap php7.2-cli php7.2-cgi libapache2-mod-fcgid apache2-suexec-pristine php-pear mcrypt  imagemagick libruby libapache2-mod-python php7.2-curl php7.2-intl php7.2-pspell php7.2-recode php7.2-sqlite3 php7.2-tidy php7.2-xmlrpc php7.2-xsl memcached php-memcache php-imagick php-gettext php7.2-zip php7.2-mbstring php-soap php7.2-soap
 RUN echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf && a2enconf servername
 ADD ./etc/apache2/conf-available/httpoxy.conf /etc/apache2/conf-available/httpoxy.conf
@@ -87,10 +65,12 @@ RUN a2enmod suexec rewrite ssl actions include dav_fs dav auth_digest cgi header
 # PHP Opcode cache
 RUN apt-get -y install php7.2-opcache php-apcu
 
-# PHP-FPM
+# PHP 7.2 FPM
 RUN apt-get -y install php7.2-fpm
+
 RUN a2enmod actions proxy_fcgi alias 
 RUN service apache2 stop
+
 
 # Install BIND DNS Server
 RUN apt-get -y install bind9 dnsutils haveged
@@ -112,6 +92,7 @@ RUN cd /tmp \
 && cd jailkit-2.19 \
 && echo 5 > debian/compat \
 && ./debian/rules binary \
+&& make install \
 && cd /tmp \
 && rm -rf jailkit-2.19*
 
@@ -132,6 +113,7 @@ ADD ./wait-for-it.sh /wait-for-it.sh
 ADD ./autoinstall.ini /root/autoinstall.ini
 ADD ./start.sh /start.sh
 ADD ./supervisord.conf /etc/supervisor/supervisord.conf
+ADD ./etc/rsyslog/rsyslog.conf /etc/rsyslog.conf
 ADD ./etc/cron.daily/sql_backup.sh /etc/cron.daily/sql_backup.sh
 
 # Install ISPConfig 3
