@@ -48,6 +48,7 @@ RUN touch /usr/share/man/man5/maildir.courier.5.gz  \
 RUN echo 'phpmyadmin phpmyadmin/dbconfig-install boolean true' | debconf-set-selections
 RUN echo 'phpmyadmin phpmyadmin/mysql/admin-pass password pass' | debconf-set-selections
 RUN apt-get -y install phpmyadmin    
+ADD ./etc/phpmyadmin/phpmyadmin.ini /root/phpmyadmin.ini
       
 # Workaround maildrop install  bug
 RUN touch /usr/share/man/man5/maildir.maildrop.5.gz \

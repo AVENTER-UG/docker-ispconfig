@@ -26,6 +26,9 @@ echo "ALTER TABLE dbispconfig.sys_user MODIFY passwort VARCHAR(140);"  | mysql -
 # Bugfix ISPconfig missing markerline
 envsubst < /root/authmysqlrc.ini > /etc/courier/authmysqlrc
 
+# configure phpmyadmin
+envsubst < /root/phpmyadmin.ini > /etc/phpmyadmin/config.inc.php
+
 mkdir -p /etc/courier/shared/index
 chmod -R 770 /etc/courier/shared
 
@@ -55,6 +58,8 @@ if [ "$isp_enable_apache" == "y" ];
 then
   /etc/init.d/php7.2-fpm start
 fi
+
+/etc/init.d/cron restart
 
 unset isp_mysql_root_password
 unset isp_mysql_ispconfig_password

@@ -1,5 +1,10 @@
 # ISPConfig3 in a docker container
 
+
+<a href="https://riot.im/app/#/room/#support:matrix.aventer.biz" target="_new"><img src="https://img.shields.io/static/v1?label=Chat&message=Matrix&color=brightgreen"></a></span></a>
+<a href="https://hub.docker.com/r/avhost/ispconfig" target="_new">![Docker Pulls](https://img.shields.io/docker/pulls/avhost/ispconfig)</a>
+<a href="https://liberapay.com/AVENTER" target="_new"><img src="https://img.shields.io/liberapay/receives/AVENTER.svg?logo=liberapay"></a>
+
 This docker image include a whole ISPConfig3 software stack. For details, I'm sorry have a look in the Dockerfile. Later I will write down all installed packages.
 
 ## How to use it
@@ -55,6 +60,7 @@ services:
       isp_enable_multiserver: "y"
       isp_hostname: "server1"
       isp_use_ssl: "y"
+      isp_phpmyadmin_blowfish_secret: "advpDZ9wHZXkZSfV78DLRjzSPaTm5yBC"
 
 networks:
   default:
