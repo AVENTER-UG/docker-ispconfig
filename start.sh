@@ -67,5 +67,9 @@ unset isp_mysql_ispconfig_password
 unset isp_mysql_master_root_password
 unset isp_admin_password
 
+# fix rncd erro
+chown root:bind /etc/bind/rndc.key
+# fix index permission error
+chown courier: /etc/courier/shared/index
 
 /usr/bin/supervisord -c /etc/supervisor/supervisord.conf

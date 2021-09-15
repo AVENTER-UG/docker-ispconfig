@@ -2,6 +2,7 @@ FROM ubuntu:18.04
 
 MAINTAINER Andreas Peters <support@aventer.biz> version: 0.2
 
+ARG TAG_SYN=add-dsgvo
 
 ENV isp_mysql_hostname localhost
 ENV isp_mysql_root_password default
@@ -23,7 +24,7 @@ ENV isp_cert_hostname localhost
 ENV isp_use_ssl y
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get -y update && apt-get -y upgrade && apt-get -y install quota quotatool software-properties-common quota mysql-client wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base
+RUN apt-get -y update && apt-get -y upgrade && apt-get -y install quota quotatool software-properties-common quota mysql-client wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base git
 
 # Remove sendmail
 RUN echo -n "Removing Sendmail... "	service sendmail stop hide_output update-rc.d -f sendmail remove apt_remove sendmail
@@ -127,9 +128,7 @@ ADD ./etc/rsyslog/rsyslog.conf /etc/rsyslog.conf
 ADD ./etc/cron.daily/sql_backup.sh /etc/cron.daily/sql_backup.sh
 
 # Install ISPConfig 3
-RUN cd /tmp \
-&& wget -O ISPConfig.tgz https://ispconfig.org/downloads/ISPConfig-3.1.15p2.tar.gz \
-&& tar xfz ISPConfig.tgz
+RUN git clone --branch $TAG_SYN --depth 1 https://github.com/AVENTER-UG/ispconfig3.git /tmp/ispconfig3_install
 
 ADD ./update.php /tmp/ispconfig3_install/install/update.php
 ADD ./install.php /tmp/ispconfig3_install/install/install.php
@@ -148,6 +147,11 @@ RUN mkdir -p /var/run/sshd
 RUN mkdir -p /var/log/supervisor
 ADD ./bin/systemctl /bin/systemctl
 RUN mkdir -p /var/backup/sql
+RUN mkdir -p /var/spool/postfix/private
+RUN touch /var/spool/postfix/private/quota-status
+RUN chown postfix:root /var/spool/postfix/private
+RUN chown postfix:postfix /var/spool/postfix/private/quota-status
+RUN chmod 0660 /var/spool/postfix/private/quota-status
 
 RUN ln -s /dev/urandom /root/.rnd
 RUN rm -rf /dev/random \
