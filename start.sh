@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo $(grep $(hostname) /etc/hosts | cut -f1) localhost >> /etc/hosts
+
 envsubst < /root/autoinstall.ini > /tmp/ispconfig3_install/install/autoinstall.ini
 
 echo $isp_hostname > /etc/mailname
