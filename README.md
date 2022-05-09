@@ -2,7 +2,7 @@
 
 
 <a href="https://riot.im/app/#/room/#support:matrix.aventer.biz" target="_new"><img src="https://img.shields.io/static/v1?label=Chat&message=Matrix&color=brightgreen"></a></span></a>
-<a href="https://hub.docker.com/r/avhost/ispconfig" target="_new">![Docker Pulls](https://img.shields.io/docker/pulls/avhost/ispconfig)</a>
+<a href="https://hub.docker.com/r/avhost/docker-ispconfig" target="_new">![Docker Pulls](https://img.shields.io/docker/pulls/avhost/docker-ispconfig)</a>
 <a href="https://liberapay.com/AVENTER" target="_new"><img src="https://img.shields.io/liberapay/receives/AVENTER.svg?logo=liberapay"></a>
 
 This docker image include a whole ISPConfig3 software stack. For details, I'm sorry have a look in the Dockerfile. Later I will write down all installed packages.
@@ -28,7 +28,7 @@ services:
       MYSQL_ROOT_PASSWORD: <PASSWORD>
 
   server1:
-    image: avhost/ispconfig:latest
+image: avhost/docker-ispconfig:latest
     ports:
       - "443:443"
       - "80:80"
@@ -92,3 +92,9 @@ Yes its working! We are using it with weave.works and docker-compose. At the hos
 ## What it is not
 
 It's definitly not a microservice. :-) So, you cannot recreate the running container like you want and to everytime. You need a downtime, and maybe you also have so cleanup a little bit after you restart the container.
+
+# Sponsors
+
+Thanks to my sponsor.
+
+![FERB](https://avatars.githubusercontent.com/u/98983967?s=60&v=4)
