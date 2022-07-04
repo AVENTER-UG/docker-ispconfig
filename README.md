@@ -32,7 +32,7 @@ image: avhost/docker-ispconfig:latest
     ports:
       - "443:443"
       - "80:80"
-    volumes: ["/data/amavis:/var/lib/amavis","/data/etc/amavis:/etc/amavis", "/data/letsencrypt:/etc/letsencrypt", "/data/etc/apache2/sites-available:/etc/apache2/sites-available", "/data/etc/apache2/sites-enabled:/etc/apache2/sites-enabled", "/data/www:/var/www/", "/data/backup:/var/backup/", "/data/usr:/usr/local/ispconfig", "/data/etc/cron.d:/etc/cron.d", "/data/kis/bind:/etc/bind"]
+    volumes: ["/data/amavis:/var/lib/amavis","/data/etc/amavis:/etc/amavis", "/data/letsencrypt:/etc/letsencrypt", "/data/etc/apache2/sites-available:/etc/apache2/sites-available", "/data/etc/apache2/sites-enabled:/etc/apache2/sites-enabled", "/data/www:/var/www/", "/data/backup:/var/backup/", "/data/usr:/usr/local/ispconfig", "/data/etc/cron.d:/etc/cron.d", "/data/kis/bind:/etc/bind", "/data/mail:/var/vmail/"]
     restart: always
     depends_on:
       - master
@@ -57,8 +57,8 @@ image: avhost/docker-ispconfig:latest
       isp_enable_nginx: "y"
       isp_enable_firewall: "y"
       isp_enable_webinterface: "n"
-      isp_enable_multiserver: "y"
-      isp_hostname: "server1"
+      isp_enable_multiserver: "n"
+      isp_hostname: "<$HOSTNAME>"
       isp_use_ssl: "y"
       isp_phpmyadmin_blowfish_secret: "advpDZ9wHZXkZSfV78DLRjzSPaTm5yBC"
 
