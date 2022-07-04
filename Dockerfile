@@ -5,10 +5,14 @@ MAINTAINER Andreas Peters <support@aventer.biz> version: 0.2
 ARG TAG_SYN=master
 
 ENV isp_mysql_hostname localhost
+ENV isp_mysql_root_user root
 ENV isp_mysql_root_password default
+ENV isp_mysql_database dbispconfig
 ENV isp_mysql_ispconfig_password default
+ENV isp_mysql_master_root_user root
 ENV isp_mysql_master_root_password default
 ENV isp_mysql_master_hostname localhost
+ENV isp_mysql_master_database dbispconfig
 ENV isp_admin_password default
 ENV isp_enable_mail n
 ENV isp_enable_jailkit n
