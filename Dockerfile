@@ -2,7 +2,7 @@ FROM ubuntu:focal
 
 MAINTAINER Andreas Peters <support@aventer.biz> version: 0.2
 
-ARG TAG_SYN=add-dsgvo
+ARG TAG_SYN=master
 
 ENV isp_mysql_hostname localhost
 ENV isp_mysql_root_user root
