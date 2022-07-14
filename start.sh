@@ -19,9 +19,9 @@ sed -i "s/^hosts .*$/hosts = $isp_mysql_hostname/g" /etc/postfix/mysql-virtual_o
 sed -i "s/^myhostname = .*$/myhostname = $isp_hostname/g" /etc/postfix/main.cf
 echo message_size_limit=52428800 >> /etc/postfix/main.cf
 
-echo "UPDATE mysql.user SET Host = '%' WHERE User like 'ispc%';" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
-echo "UPDATE mysql.db SET Host = '%' WHERE User like 'ispc%';" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
-echo "FLUSH PRIVILEGES;" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
+#echo "UPDATE mysql.user SET Host = '%' WHERE User like 'ispc%';" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
+#echo "UPDATE mysql.db SET Host = '%' WHERE User like 'ispc%';" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
+#echo "FLUSH PRIVILEGES;" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
 
 # Bugfix ISPconfig mysql error
 echo "ALTER TABLE dbispconfig.sys_user MODIFY passwort VARCHAR(140);"  | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
@@ -54,12 +54,12 @@ fi
 
 if [ "$isp_enable_nginx" == "y" ];
 then
-  /etc/init.d/php7.2-fpm start
+  /etc/init.d/php7.4-fpm start
 fi
 
 if [ "$isp_enable_apache" == "y" ];
 then
-  /etc/init.d/php7.2-fpm start
+  /etc/init.d/php7.4-fpm start
 fi
 
 /etc/init.d/cron restart
@@ -68,6 +68,7 @@ unset isp_mysql_root_password
 unset isp_mysql_ispconfig_password
 unset isp_mysql_master_root_password
 unset isp_admin_password
+unset isp_mysql_database
 
 # fix rncd erro
 chown root:bind /etc/bind/rndc.key

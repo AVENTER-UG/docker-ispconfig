@@ -30,30 +30,30 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
 	ISPConfig 3 installer.
-	
+
 	-------------------------------------------------------------------------------------
 	- Interactive install
 	-------------------------------------------------------------------------------------
 	run:
-	
+
 	php install.php
-	
+
 	-------------------------------------------------------------------------------------
 	- Noninteractive (autoinstall) mode
 	-------------------------------------------------------------------------------------
-	
+
 	The autoinstall mode can read the installer questions from a .ini style file or from
-	a php config file. Examples for both file types are in the docs folder. 
+	a php config file. Examples for both file types are in the docs folder.
 	See autoinstall.ini.sample and autoinstall.conf_sample.php.
-	
+
 	run:
-	
+
 	php install.php --autoinstall=autoinstall.ini
-	
+
 	or
-	
+
 	php install.php --autoinstall=autoinstall.conf.php
-	
+
 */
 
 error_reporting(E_ALL|E_STRICT);
@@ -146,9 +146,10 @@ include_once 'dist/conf/'.$dist['confid'].'.conf.php';
 //** Installer Interface
 //****************************************************************************************************
 $inst = new installer();
-if (!$inst->get_php_version()) die('ISPConfig requieres PHP '.$inst->min_php."\n");
 $retval=shell_exec("which which");
-if (empty($retval)) die ("ISPConfig requieres which \n");
+if (empty($retval)) die ("ISPConfig requires which \n");
+
+$inst->check_prerequisites();
 
 swriteln($inst->lng('    Following will be a few questions for primary configuration so be careful.'));
 swriteln($inst->lng('    Default values are in [brackets] and can be accepted with <ENTER>.'));
@@ -159,18 +160,28 @@ if(!is_writable(dirname(ISPC_LOG_FILE))){
 	die("ERROR: Cannot write to the ".dirname(ISPC_LOG_FILE)." directory. Are you root or sudo ?\n\n");
 }
 
+//** Check for ISPConfig 2.x versions
 if(is_dir('/root/ispconfig') || is_dir('/home/admispconfig')) {
-	die('This software cannot be installed on a server wich runs ISPConfig 2.x.');
+	if(is_dir('/home/admispconfig')) {
+		die('This software cannot be installed on a server which runs ISPConfig 2.x.');
+	} else {
+		die('This software cannot be installed on a server which runs ISPConfig 2.x; the presence of the /root/ispconfig/ directory may indicate an ISPConfig 2.x installation, otherwise you can remove or rename it to continue.');
+	}
 }
 
 /*
 if(is_dir('/usr/local/ispconfig')) {
 	die('ISPConfig 3 installation found. Please use update.php instead if install.php to update the installation.');
 }
-*/
+ */
 
 //** Detect the installed applications
 $inst->find_installed_apps();
+
+//* crontab required by ISPConfig
+if(!$conf['cron']['installed']) {
+	die("crontab not found; please install a compatible cron daemon before ISPConfig\n\n");
+}
 
 //** Select the language and set default timezone
 $conf['language'] = $inst->simple_query('Select language', array('en', 'de'), 'en','language');
@@ -204,17 +215,17 @@ if(!function_exists('mysqli_connect')) die('No PHP MySQLi functions available. P
 //** Get MySQL root credentials
 $finished = false;
 do {
-	$tmp_mysql_server_host = $inst->free_query('MySQL server hostname', $conf['mysql']['host'],'mysql_hostname');	 
+	$tmp_mysql_server_host = $inst->free_query('MySQL server hostname', $conf['mysql']['host'],'mysql_hostname');
 	$tmp_mysql_server_port = $inst->free_query('MySQL server port', $conf['mysql']['port'],'mysql_port');
-	$tmp_mysql_server_admin_user = $inst->free_query('MySQL root username', $conf['mysql']['admin_user'],'mysql_root_user');	 
-	$tmp_mysql_server_admin_password = $inst->free_query('MySQL root password', $conf['mysql']['admin_password'],'mysql_root_password');	 
-	$tmp_mysql_server_database = $inst->free_query('MySQL database to create', $conf['mysql']['database'],'mysql_database');	 
+	$tmp_mysql_server_admin_user = $inst->free_query('MySQL root username', $conf['mysql']['admin_user'],'mysql_root_user');
+	$tmp_mysql_server_admin_password = $inst->free_query('MySQL root password', $conf['mysql']['admin_password'],'mysql_root_password');
+	$tmp_mysql_server_database = $inst->free_query('MySQL database to create', $conf['mysql']['database'],'mysql_database');
 	$tmp_mysql_server_charset = $inst->free_query('MySQL charset', $conf['mysql']['charset'],'mysql_charset');
-	
+
 	if($install_mode == 'expert') {
 		swriteln("The next two questions are about the internal ISPConfig database user and password.\nIt is recommended to accept the defaults which are 'ispconfig' as username and a random password.\nIf you use a different password, use only numbers and chars for the password.\n");
-		
-		$conf['mysql']['ispconfig_user'] = $inst->free_query('ISPConfig mysql database username', $conf['mysql']['ispconfig_user'],'mysql_ispconfig_user');	 
+
+		$conf['mysql']['ispconfig_user'] = $inst->free_query('ISPConfig mysql database username', $conf['mysql']['ispconfig_user'],'mysql_ispconfig_user');
 		$conf['mysql']['ispconfig_password'] = $inst->free_query('ISPConfig mysql database password', $conf['mysql']['ispconfig_password'],'mysql_ispconfig_password');
 	}
 
@@ -264,10 +275,10 @@ if($install_mode == 'expert' && strtolower($inst->simple_query('Shall this serve
 	//** Get MySQL root credentials
 	$finished = false;
 	do {
-		$tmp_mysql_server_host = $inst->free_query('MySQL master server hostname', $conf['mysql']['master_host'],'mysql_master_hostname'); 
+		$tmp_mysql_server_host = $inst->free_query('MySQL master server hostname', $conf['mysql']['master_host'],'mysql_master_hostname');
 		$tmp_mysql_server_port = $inst->free_query('MySQL master server port', $conf['mysql']['master_port'],'mysql_master_port');
-		$tmp_mysql_server_admin_user = $inst->free_query('MySQL master server root username', $conf['mysql']['master_admin_user'],'mysql_master_root_user');	 
-		$tmp_mysql_server_admin_password = $inst->free_query('MySQL master server root password', $conf['mysql']['master_admin_password'],'mysql_master_root_password'); 
+		$tmp_mysql_server_admin_user = $inst->free_query('MySQL master server root username', $conf['mysql']['master_admin_user'],'mysql_master_root_user');
+		$tmp_mysql_server_admin_password = $inst->free_query('MySQL master server root password', $conf['mysql']['master_admin_password'],'mysql_master_root_password');
 		$tmp_mysql_server_database = $inst->free_query('MySQL master server database name', $conf['mysql']['master_database'],'mysql_master_database');
 
 		//* Initialize the MySQL server connection
@@ -491,6 +502,12 @@ if($force) {
 	swriteln('Configuring OpenVZ');
 }
 
+// Configure AppArmor
+if($conf['apparmor']['installed']){
+  swriteln('Configuring AppArmor');
+  $inst->configure_apparmor();
+}
+
 if($install_mode == 'standard' || strtolower($inst->simple_query('Configure Firewall Server', array('y', 'n'), 'y','configure_firewall')) == 'y') {
 	//* Check for Firewall
 	if(!$conf['ufw']['installed'] && !$conf['firewall']['installed']) {
@@ -536,13 +553,17 @@ if($force) {
 	$inst->configure_fail2ban();
 }
 
-if($conf['services']['web'] == true) {
-	//** Configure apps vhost
-	swriteln('Configuring Apps vhost');
-	$inst->configure_apps_vhost();
+// create acme vhost
+if($conf['nginx']['installed'] == true) {
+	$inst->make_acme_vhost('nginx'); // we need this config file but we don't want nginx to be restarted at this point
+}
+if($conf['apache']['installed'] == true) {
+	$inst->make_acme_vhost('apache'); // we need this config file but we don't want apache to be restarted at this point
 }
 
 //** Configure ISPConfig :-)
+$issue_asked = false;
+$issue_tried = false;
 $install_ispconfig_interface_default = ($conf['mysql']['master_slave_setup'] == 'y')?'n':'y';
 if($install_mode == 'standard' || strtolower($inst->simple_query('Install ISPConfig Web Interface', array('y', 'n'), $install_ispconfig_interface_default,'install_ispconfig_web_interface')) == 'y') {
 	swriteln('Installing ISPConfig');
@@ -567,13 +588,35 @@ if($install_mode == 'standard' || strtolower($inst->simple_query('Install ISPCon
 	if($conf['nginx']['installed'] == true) $conf['nginx']['vhost_port']  = $ispconfig_vhost_port;
 	unset($ispconfig_vhost_port);
 
-	if(strtolower($inst->simple_query('Do you want a secure (SSL) connection to the ISPConfig web interface', array('y', 'n'), 'y','ispconfig_use_ssl')) == 'y') {	 
+	if(strtolower($inst->simple_query('Do you want a secure (SSL) connection to the ISPConfig web interface', array('y', 'n'), 'y','ispconfig_use_ssl')) == 'y') {
 		$inst->make_ispconfig_ssl_cert();
+		$issue_tried = true;
 	}
+	$issue_asked = true;
 	$inst->install_ispconfig_interface = true;
 
 } else {
 	$inst->install_ispconfig_interface = false;
+}
+
+// Create SSL certs for non-webserver(s)?
+if(!$issue_asked) {
+    if(!file_exists('/usr/local/ispconfig/interface/ssl/ispserver.crt')) {
+        if(!$issue_tried && strtolower($inst->simple_query('Do you want to create SSL certs for your server?', array('y', 'n'), 'y','create_ssl_server_certs')) == 'y') {
+            $inst->make_ispconfig_ssl_cert();
+	    }
+    } else {
+        swriteln('Certificate exists. Not creating a new one.');
+    }
+}
+
+// update acme.sh if installed
+$inst->update_acme();
+
+if($conf['services']['web'] == true) {
+	//** Configure apps vhost
+	swriteln('Configuring Apps vhost');
+	$inst->configure_apps_vhost();
 }
 
 $inst->install_ispconfig();
@@ -584,10 +627,7 @@ $inst->configure_dbserver();
 
 //* Configure ISPConfig
 swriteln('Installing ISPConfig crontab');
-if($conf['cron']['installed']) {
-	swriteln('Installing ISPConfig crontab');
-	$inst->install_crontab();
-} else swriteln('[ERROR] Cron not found');
+$inst->install_crontab();
 
 swriteln('Detect IP addresses');
 $inst->detect_ips();
@@ -598,7 +638,7 @@ if($conf['postfix']['installed'] == true && $conf['postfix']['init_script'] != '
 if($conf['saslauthd']['installed'] == true && $conf['saslauthd']['init_script'] != '') system($inst->getinitcommand($conf['saslauthd']['init_script'], 'restart'));
 if($conf['amavis']['installed'] == true && $conf['amavis']['init_script'] != '') system($inst->getinitcommand($conf['amavis']['init_script'], 'restart'));
 if($conf['rspamd']['installed'] == true && $conf['rspamd']['init_script'] != '') system($inst->getinitcommand($conf['rspamd']['init_script'], 'restart'));
-if($conf['clamav']['installed'] == true && $conf['clamav']['init_script'] != '') system($inst->getinitcommand($conf['clamav']['init_script'], 'restart'));
+if($conf['clamav']['installed'] == true && $conf['clamav']['init_script'] != '' && $conf['amavis']['installed'] == true) system($inst->getinitcommand($conf['clamav']['init_script'], 'restart'));
 if($conf['courier']['installed'] == true){
 	if($conf['courier']['courier-authdaemon'] != '') system($inst->getinitcommand($conf['courier']['courier-authdaemon'], 'restart'));
 	if($conf['courier']['courier-imap'] != '') system($inst->getinitcommand($conf['courier']['courier-imap'], 'restart'));
@@ -636,3 +676,4 @@ echo "Installation completed.\n";
 
 
 ?>
+

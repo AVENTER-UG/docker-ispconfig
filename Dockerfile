@@ -1,8 +1,8 @@
-FROM ubuntu:18.04
+FROM ubuntu:focal
 
 MAINTAINER Andreas Peters <support@aventer.biz> version: 0.2
 
-ARG TAG_SYN=master
+ARG TAG_SYN=add-dsgvo
 
 ENV isp_mysql_hostname localhost
 ENV isp_mysql_root_user root
@@ -60,7 +60,7 @@ RUN touch /usr/share/man/man5/maildir.maildrop.5.gz \
     && touch /usr/share/man/man7/maildirquota.maildrop.7.gz \
     && apt-get install -y maildrop
 
-RUN apt-get -y install postfix mysql-client postfix-mysql postfix-doc openssl getmail4 rkhunter binutils courier-authlib-mysql courier-pop courier-pop-ssl courier-imap courier-imap-ssl libsasl2-2 libsasl2-modules libsasl2-modules-sql sasl2-bin libpam-mysql sudo gamin
+RUN apt-get -y install postfix mysql-client postfix-mysql postfix-doc openssl getmail4 rkhunter binutils courier-authlib-mysql courier-pop courier-pop courier-imap courier-imap libsasl2-2 libsasl2-modules libsasl2-modules-sql sasl2-bin libpam-mysql sudo gamin
 ADD ./etc/postfix/master.cf /etc/postfix/master.cf
 ADD ./etc/security/limits.conf /etc/security/limits.conf
 ADD ./etc/courier/authmysqlrc.ini /root/authmysqlrc.ini
@@ -72,16 +72,16 @@ ADD ./etc/clamav/clamd.conf /etc/clamav/clamd.conf
 RUN service spamassassin stop 
 RUN service clamav-daemon stop 
 # Install Apache2, PHP, FCGI, suExec, Pear, And mcrypt
-RUN apt-get -y install apache2 apache2-doc apache2-utils libapache2-mod-php php7.2 php7.2-common php7.2-gd php7.2-mysql php7.2-imap php7.2-cli php7.2-cgi libapache2-mod-fcgid apache2-suexec-pristine php-pear mcrypt  imagemagick libruby libapache2-mod-python php7.2-curl php7.2-intl php7.2-pspell php7.2-recode php7.2-sqlite3 php7.2-tidy php7.2-xmlrpc php7.2-xsl memcached php-memcache php-imagick php-gettext php7.2-zip php7.2-mbstring php-soap php7.2-soap
+RUN apt-get -y install apache2 apache2-doc apache2-utils libapache2-mod-php php7.4 php7.4-common php7.4-gd php7.4-mysql php7.4-imap php7.4-cli php7.4-cgi libapache2-mod-fcgid apache2-suexec-pristine php-pear mcrypt  imagemagick libruby libapache2-mod-python php7.4-curl php7.4-intl php7.4-pspell php7.4-sqlite3 php7.4-tidy php7.4-xmlrpc php7.4-xsl memcached php-memcache php-imagick php7.4-zip php7.4-mbstring php-soap php7.4-soap
 RUN echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf && a2enconf servername
 ADD ./etc/apache2/conf-available/httpoxy.conf /etc/apache2/conf-available/httpoxy.conf
 RUN a2enmod suexec rewrite ssl actions include dav_fs dav auth_digest cgi headers && a2enconf httpoxy && a2dissite 000-default && service apache2 restart
 
 # PHP Opcode cache
-RUN apt-get -y install php7.2-opcache php-apcu
+RUN apt-get -y install php7.4-opcache php-apcu
 
-# PHP 7.2 FPM
-RUN apt-get -y install php7.2-fpm
+# PHP 7.4 FPM
+RUN apt-get -y install php7.4-fpm
 
 RUN a2enmod actions proxy_fcgi alias 
 RUN service apache2 stop
@@ -90,9 +90,9 @@ RUN service apache2 stop
 # Install BIND DNS Server
 RUN apt-get -y install bind9 dnsutils haveged
 # deactivate ipv6
-RUN sed -i 's/-u bind/-u bind -4/g' /etc/default/bind9
+RUN sed -i 's/-u bind/-u bind -4/g' /etc/default/named
 RUN service haveged start
-RUN service bind9 stop
+RUN service named stop
 
 
 # Install Vlogger, Webalizer, and AWStats
@@ -100,7 +100,7 @@ RUN apt-get -y install vlogger webalizer awstats geoip-database libclass-dbi-mys
 ADD etc/cron.d/awstats /etc/cron.d/
 
 # Install Jailkit
-RUN apt-get -y install build-essential autoconf automake libtool flex bison debhelper binutils
+RUN apt-get -y install build-essential autoconf automake libtool flex bison debhelper binutils python
 RUN cd /tmp \
 && wget http://olivier.sessink.nl/jailkit/jailkit-2.19.tar.gz \
 && tar xvfz jailkit-2.19.tar.gz \
@@ -118,10 +118,10 @@ ADD ./etc/fail2ban/filter.d/pureftpd.conf /etc/fail2ban/filter.d/pureftpd.conf
 ADD ./etc/fail2ban/filter.d/postfix-sasl.conf /etc/fail2ban/filter.d/postfix-sasl.conf
 
 # Install Let's Encrypt
-RUN apt-get -y install python-certbot-apache
+RUN apt-get -y install python3-certbot-apache
 
 # UFW firewall
-RUN apt-get install ufw
+RUN apt-get -y install ufw
 
 # ISPCONFIG Initialization and Startup Script
 ADD ./wait-for-it.sh /wait-for-it.sh
@@ -133,6 +133,7 @@ ADD ./etc/cron.daily/sql_backup.sh /etc/cron.daily/sql_backup.sh
 
 # Install ISPConfig 3
 RUN git clone --branch $TAG_SYN --depth 1 https://github.com/AVENTER-UG/ispconfig3.git /tmp/ispconfig3_install
+#COPY ispconfig3 /tmp/ispconfig3_install
 
 ADD ./update.php /tmp/ispconfig3_install/install/update.php
 ADD ./install.php /tmp/ispconfig3_install/install/install.php
