@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-#   Use this script to test if a given TCP host/port are available
 
 cp -r --parents /var/lib/amavis/ /var/backup/
 cp -r --parents /etc/amavis/ /var/backup/

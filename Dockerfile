@@ -1,6 +1,6 @@
 FROM ubuntu:focal
 
-MAINTAINER Andreas Peters <support@aventer.biz> version: 0.2
+LABEL Andreas Peters <support@aventer.biz> version: 0.2
 
 ARG TAG_SYN=master
 
@@ -19,7 +19,7 @@ ENV isp_enable_jailkit n
 ENV isp_enable_ftp n
 ENV isp_enable_dns y
 ENV isp_enable_apache y
-ENV isp_enable_nginx y
+ENV isp_enable_nginx n
 ENV isp_enable_firewall y
 ENV isp_enable_webinterface y
 ENV isp_enable_multiserver n
@@ -28,7 +28,10 @@ ENV isp_cert_hostname localhost
 ENV isp_use_ssl y
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get -y update && apt-get -y upgrade && apt-get -y install quota quotatool software-properties-common quota mysql-client wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base git
+RUN apt-get -y update && apt-get -y upgrade && apt-get -y install quota quotatool software-properties-common quota mysql-client wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base git 
+
+#Falko additions
+RUN apt-get -y install ntp mc iputils-ping unzip bzip2 arj nomarch lzop 
 
 # Remove sendmail
 RUN echo -n "Removing Sendmail... "	service sendmail stop hide_output update-rc.d -f sendmail remove apt_remove sendmail
@@ -36,7 +39,8 @@ RUN echo -n "Removing Sendmail... "	service sendmail stop hide_output update-rc.
 # Install OpenSSH 
 RUN apt-get -y install ssh openssh-server rsync
 
-
+# Install eMail System
+if ["isp_enable_mail" = "y"]; then
 # Install Postfix, Dovecot, rkhunter, binutils
 RUN echo -n "Installing SMTP Mail server (Postfix)... " \
 RUN apt-get install -y courier-authdaemon courier-authlib courier-authlib-userdb 
@@ -48,12 +52,6 @@ RUN touch /usr/share/man/man5/maildir.courier.5.gz  \
     && touch /usr/share/man/man1/makedat.courier.1.gz \
     && ls -l /usr/share/man/man7/ \
     && apt-get -y install courier-base
-
-# Install PhpMyAdmin
-RUN echo 'phpmyadmin phpmyadmin/dbconfig-install boolean true' | debconf-set-selections
-RUN echo 'phpmyadmin phpmyadmin/mysql/admin-pass password pass' | debconf-set-selections
-RUN apt-get -y install phpmyadmin    
-ADD ./etc/phpmyadmin/phpmyadmin.ini /root/phpmyadmin.ini
       
 # Workaround maildrop install  bug
 RUN touch /usr/share/man/man5/maildir.maildrop.5.gz \
@@ -71,6 +69,16 @@ RUN apt-get -y install amavisd-new spamassassin clamav clamav-daemon unzip bzip2
 ADD ./etc/clamav/clamd.conf /etc/clamav/clamd.conf
 RUN service spamassassin stop 
 RUN service clamav-daemon stop 
+; else RUN echo -n "No eMail System Installed..."; fi
+
+# Install Apache System
+if ["isp_enable_apache" = "y"]; then
+# Install PhpMyAdmin
+RUN echo 'phpmyadmin phpmyadmin/dbconfig-install boolean true' | debconf-set-selections
+RUN echo 'phpmyadmin phpmyadmin/mysql/admin-pass password pass' | debconf-set-selections
+RUN apt-get -y install phpmyadmin    
+ADD ./etc/phpmyadmin/phpmyadmin.ini /root/phpmyadmin.ini
+
 # Install Apache2, PHP, FCGI, suExec, Pear, And mcrypt
 RUN apt-get -y install apache2 apache2-doc apache2-utils libapache2-mod-php php7.4 php7.4-common php7.4-gd php7.4-mysql php7.4-imap php7.4-cli php7.4-cgi libapache2-mod-fcgid apache2-suexec-pristine php-pear mcrypt  imagemagick libruby libapache2-mod-python php7.4-curl php7.4-intl php7.4-pspell php7.4-sqlite3 php7.4-tidy php7.4-xmlrpc php7.4-xsl memcached php-memcache php-imagick php7.4-zip php7.4-mbstring php-soap php7.4-soap
 RUN echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf && a2enconf servername
@@ -83,23 +91,34 @@ RUN apt-get -y install php7.4-opcache php-apcu
 # PHP 7.4 FPM
 RUN apt-get -y install php7.4-fpm
 
+# Mod PageSpeed
+RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb
+RUN dpkg -i mod-pagespeed-stable_current_amd64.deb
+RUN apt-get -f install
+
+RUN a2enmod deflate mime_magic
 RUN a2enmod actions proxy_fcgi alias 
 RUN service apache2 stop
-
-
-# Install BIND DNS Server
-RUN apt-get -y install bind9 dnsutils haveged
-# deactivate ipv6
-RUN sed -i 's/-u bind/-u bind -4/g' /etc/default/named
-RUN service haveged start
-RUN service named stop
-
 
 # Install Vlogger, Webalizer, and AWStats
 RUN apt-get -y install vlogger webalizer awstats geoip-database libclass-dbi-mysql-perl
 ADD etc/cron.d/awstats /etc/cron.d/
 
+# Install Let's Encrypt
+RUN apt-get -y install python3-certbot-apache
+; else RUN echo -n "No Apache2 System Installed..."; fi
+
+# Install BIND DNS Server
+if ["isp_enable_dns" = "y"]; then
+RUN apt-get -y install bind9 dnsutils haveged
+# deactivate ipv6
+RUN sed -i 's/-u bind/-u bind -4/g' /etc/default/named
+RUN service haveged start
+RUN service named stop
+; else RUN echo -n "No DNS System Installed..."; fi
+
 # Install Jailkit
+if ["isp_enable_jailkit" = "y"]; then
 RUN apt-get -y install build-essential autoconf automake libtool flex bison debhelper binutils python
 RUN cd /tmp \
 && wget http://olivier.sessink.nl/jailkit/jailkit-2.19.tar.gz \
@@ -110,15 +129,14 @@ RUN cd /tmp \
 && make install \
 && cd /tmp \
 && rm -rf jailkit-2.19*
+; else RUN echo -n "No Jailkit Installed..."; fi
+
 
 # Install fail2ban
 RUN apt-get -y install fail2ban 
 ADD ./etc/fail2ban/jail.local /etc/fail2ban/jail.local
 ADD ./etc/fail2ban/filter.d/pureftpd.conf /etc/fail2ban/filter.d/pureftpd.conf
 ADD ./etc/fail2ban/filter.d/postfix-sasl.conf /etc/fail2ban/filter.d/postfix-sasl.conf
-
-# Install Let's Encrypt
-RUN apt-get -y install python3-certbot-apache
 
 # UFW firewall
 RUN apt-get -y install ufw
@@ -143,7 +161,7 @@ ADD ./etc/clamav/clamd.conf /etc/clamav/clamd.conf
 
 RUN echo "export TERM=xterm" >> /root/.bashrc
 
-EXPOSE 53 80/tcp 443/tcp 953/tcp 8080/tcp 30000 30001 30002 30003 30004 30005 30006 30007 30008 30009 3306
+#EXPOSE 53 80/tcp 443/tcp 953/tcp 8080/tcp 30000 30001 30002 30003 30004 30005 30006 30007 30008 30009 3306
 
 
 
@@ -152,11 +170,14 @@ RUN mkdir -p /var/run/sshd
 RUN mkdir -p /var/log/supervisor
 ADD ./bin/systemctl /bin/systemctl
 RUN mkdir -p /var/backup/sql
+
+if ["isp_enable_mail" = "y"]; then
 RUN mkdir -p /var/spool/postfix/private
 RUN touch /var/spool/postfix/private/quota-status
 RUN chown postfix:root /var/spool/postfix/private
 RUN chown postfix:postfix /var/spool/postfix/private/quota-status
 RUN chmod 0660 /var/spool/postfix/private/quota-status
+; else RUN echo -n "No eMail System Installed..."; fi
 
 RUN ln -s /dev/urandom /root/.rnd
 RUN rm -rf /dev/random \
