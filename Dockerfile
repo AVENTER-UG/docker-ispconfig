@@ -5,6 +5,7 @@ MAINTAINER Andreas Peters <support@aventer.biz> version: 0.2
 ARG TAG_SYN=master
 
 ENV isp_mysql_hostname localhost
+ENV isp_mysql_port 3306
 ENV isp_mysql_root_user root
 ENV isp_mysql_root_password default
 ENV isp_mysql_database dbispconfig
@@ -143,7 +144,7 @@ ADD ./etc/clamav/clamd.conf /etc/clamav/clamd.conf
 
 RUN echo "export TERM=xterm" >> /root/.bashrc
 
-EXPOSE 53 80/tcp 443/tcp 953/tcp 8080/tcp 30000 30001 30002 30003 30004 30005 30006 30007 30008 30009 3306
+EXPOSE 53 80/tcp 443/tcp 953/tcp 8080/tcp 30000 30001 30002 30003 30004 30005 30006 30007 30008 30009 $isp_mysql_port
 
 
 

@@ -10,12 +10,15 @@ cd /tmp/ispconfig3_install/install/
 
 if [ -f /usr/local/ispconfig/interface/lib/config.inc.php ]; 
 then
-	/wait-for-it.sh master:3306 -- php -q update.php --autoinstall=/tmp/ispconfig3_install/install/autoinstall.ini
+	/wait-for-it.sh $isp_mysql_hostname:$isp_mysql_port -- php -q update.php --autoinstall=/tmp/ispconfig3_install/install/autoinstall.ini
 else
-	/wait-for-it.sh master:3306 -- php -q install.php --autoinstall=/tmp/ispconfig3_install/install/autoinstall.ini
+	/wait-for-it.sh $isp_mysql_hostname:$isp_mysql_port -- php -q install.php --autoinstall=/tmp/ispconfig3_install/install/autoinstall.ini
 fi
 
-sed -i "s/^hosts .*$/hosts = $isp_mysql_hostname/g" /etc/postfix/mysql-virtual_outgoing_bcc.cf
+# Fix from amavis ownerchip that prevents amavis to start
+chown -R amavis: /var/lib/amavis/
+
+#sed -i "s/^hosts .*$/hosts = $isp_mysql_hostname/g" /etc/postfix/mysql-virtual_outgoing_bcc.cf
 sed -i "s/^myhostname = .*$/myhostname = $isp_hostname/g" /etc/postfix/main.cf
 echo message_size_limit=52428800 >> /etc/postfix/main.cf
 
@@ -25,6 +28,7 @@ echo message_size_limit=52428800 >> /etc/postfix/main.cf
 
 # Bugfix ISPconfig mysql error
 echo "ALTER TABLE dbispconfig.sys_user MODIFY passwort VARCHAR(140);"  | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
+echo "FLUSH PRIVILEGES;" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
 
 # Bugfix ISPconfig missing markerline
 envsubst < /root/authmysqlrc.ini > /etc/courier/authmysqlrc
@@ -49,7 +53,7 @@ fi
 
 if [ "$isp_enable_dns" == "y" ];
 then
-  /etc/init.d/bind9 start
+  /etc/init.d/named start
 fi
 
 if [ "$isp_enable_nginx" == "y" ];
