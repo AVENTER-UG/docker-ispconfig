@@ -5,6 +5,7 @@ MAINTAINER Andreas Peters <support@aventer.biz> version: 0.2
 ARG TAG_SYN=master
 
 ENV isp_mysql_hostname localhost
+ENV isp_mysql_port 3306
 ENV isp_mysql_root_user root
 ENV isp_mysql_root_password default
 ENV isp_mysql_database dbispconfig
@@ -26,6 +27,14 @@ ENV isp_enable_multiserver n
 ENV isp_hostname localhost
 ENV isp_cert_hostname localhost
 ENV isp_use_ssl y
+ENV isp_change_mail_server y
+ENV isp_change_web_server y
+ENV isp_change_dns_server y
+ENV isp_change_xmpp_server y
+ENV isp_change_firewall_server y
+ENV isp_change_vserver_server y
+ENV isp_change_db_server y
+
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get -y update && apt-get -y upgrade && apt-get -y install quota quotatool software-properties-common quota mysql-client wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base git
@@ -143,7 +152,7 @@ ADD ./etc/clamav/clamd.conf /etc/clamav/clamd.conf
 
 RUN echo "export TERM=xterm" >> /root/.bashrc
 
-EXPOSE 53 80/tcp 443/tcp 953/tcp 8080/tcp 30000 30001 30002 30003 30004 30005 30006 30007 30008 30009 3306
+EXPOSE 53 80/tcp 443/tcp 953/tcp 8080/tcp 30000 30001 30002 30003 30004 30005 30006 30007 30008 30009 $isp_mysql_port
 
 
 
