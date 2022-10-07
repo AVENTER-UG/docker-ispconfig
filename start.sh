@@ -27,8 +27,8 @@ echo message_size_limit=52428800 >> /etc/postfix/main.cf
 #echo "FLUSH PRIVILEGES;" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
 
 # Bugfix ISPconfig mysql error
-echo "ALTER TABLE dbispconfig.sys_user MODIFY passwort VARCHAR(140);"  | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
-echo "FLUSH PRIVILEGES;" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
+echo "ALTER TABLE dbispconfig.sys_user MODIFY passwort VARCHAR(140);"  | mysql -u root -h$isp_mysql_hostname -P$isp_mysql_port -p$isp_mysql_root_password
+echo "FLUSH PRIVILEGES;" | mysql -u root -h$isp_mysql_hostname -P$isp_mysql_port -p$isp_mysql_root_password
 
 # Bugfix ISPconfig missing markerline
 envsubst < /root/authmysqlrc.ini > /etc/courier/authmysqlrc
