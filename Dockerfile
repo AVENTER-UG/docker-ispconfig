@@ -1,6 +1,6 @@
 FROM ubuntu:focal
 
-LABEL Andreas Peters <support@aventer.biz> & Falko Luedtke <support@falkoinc.com> version: 0.3
+MAINTAINER Andreas Peters <support@aventer.biz> version: 0.2
 
 
 ARG TAG_SYN=master
@@ -47,6 +47,10 @@ ENV isp_enable_webinterface y
 
 
 #Update Settings
+ENV isp_enable_multiserver n
+ENV isp_hostname localhost
+ENV isp_cert_hostname localhost
+ENV isp_use_ssl y
 ENV isp_change_mail_server y
 ENV isp_change_web_server y
 ENV isp_change_dns_server y
@@ -59,15 +63,11 @@ ENV isp_change_db_server y
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get -y update && apt-get -y upgrade && apt-get -y install quota quotatool software-properties-common quota mysql-client wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base git
 
-#Falko additions
-RUN apt-get -y install ntp mc iputils-ping unzip bzip2 arj nomarch lzop 
-
 # Remove sendmail
 RUN echo -n "Removing Sendmail... "	service sendmail stop hide_output update-rc.d -f sendmail remove apt_remove sendmail
 
 # Install OpenSSH 
 RUN apt-get -y install ssh openssh-server rsync
-
 
 # Install Postfix, Dovecot, rkhunter, binutils
 RUN echo -n "Installing SMTP Mail server (Postfix)... " \
