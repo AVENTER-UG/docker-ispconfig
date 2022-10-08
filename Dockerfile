@@ -5,17 +5,37 @@ LABEL Andreas Peters <support@aventer.biz> & Falko Luedtke <support@falkoinc.com
 
 ARG TAG_SYN=master
 
+#Install Settings
+ENV isp_lang_settings en
+ENV isp_hostname localhost
 ENV isp_mysql_hostname localhost
 ENV isp_mysql_port 3306
 ENV isp_mysql_root_user root
 ENV isp_mysql_root_password default
 ENV isp_mysql_database dbispconfig
+ENV isp_mysql_charset = utf8
+ENV isp__port = 8080
+ENV isp_use_ssl y
+ENV isp_admin_password default
+
+
+#SSL Cert Settings
+ENV isp_ssl_cert_country DE
+ENV isp_ssl_cert_state SH
+ENV isp_ssl_cert_locality DE
+ENV isp_ssl_cert_organisation NONE
+ENV isp_ssl_cert_organisation_unit IT
+ENV isp_cert_hostname localhost
+
+
+#Expert Settings 
 ENV isp_mysql_ispconfig_password default
+ENV isp_enable_multiserver n
+ENV isp_mysql_master_hostname localhost
 ENV isp_mysql_master_root_user root
 ENV isp_mysql_master_root_password default
-ENV isp_mysql_master_hostname localhost
 ENV isp_mysql_master_database dbispconfig
-ENV isp_admin_password default
+ENV isp_mysql_master_port 3306
 ENV isp_enable_mail n
 ENV isp_enable_jailkit n
 ENV isp_enable_ftp n
@@ -24,10 +44,9 @@ ENV isp_enable_apache y
 ENV isp_enable_nginx y
 ENV isp_enable_firewall y
 ENV isp_enable_webinterface y
-ENV isp_enable_multiserver n
-ENV isp_hostname localhost
-ENV isp_cert_hostname localhost
-ENV isp_use_ssl y
+
+
+#Update Settings
 ENV isp_change_mail_server y
 ENV isp_change_web_server y
 ENV isp_change_dns_server y
@@ -101,7 +120,6 @@ RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_
 RUN dpkg -i mod-pagespeed-stable_current_amd64.deb 
 RUN apt-get -f install 
 RUN a2enmod deflate mime_magic 
-
 
 RUN a2enmod actions proxy_fcgi alias 
 RUN service apache2 stop
