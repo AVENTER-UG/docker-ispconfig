@@ -61,6 +61,13 @@ image: avhost/docker-ispconfig:latest
       isp_hostname: "<$HOSTNAME>"
       isp_use_ssl: "y"
       isp_phpmyadmin_blowfish_secret: "advpDZ9wHZXkZSfV78DLRjzSPaTm5yBC"
+      isp_change_mail_server: "y"
+      isp_change_web_server: "y"
+      isp_change_dns_server: "y"
+      isp_change_xmpp_server: "y"
+      isp_change_firewall_server: "y"
+      isp_change_vserver_server: "y"
+      isp_change_db_server: "y"
 
 networks:
   default:
