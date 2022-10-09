@@ -34,58 +34,60 @@ services:
             - NET_ADMIN
             - NET_RAW
         environment:
+            #Install Settings
+            isp_lang_settings: "en"
+            isp_hostname: "<CHANGE HOSTNAME>"
+            isp_mysql_hostname: "master.weave.local"
+            isp_mysql_port: "3306"
+            isp_mysql_root_user: "root"
+            isp_mysql_root_password: "<CHANGE PASSWORD>"
+            isp_mysql_database: "dbispconfig"
+            isp_mysql_charset: "utf8"
+            isp_port: "8080"
+            isp_use_ssl: "y"
+            isp_admin_password: "<CHANGE PASSWORD>"
+            isp_phpmyadmin_blowfish_secret: "h~%9X!xWlFzF}S8;h_d^_SKpZfhNu#/R"  ### Generate Blowfish secret https://phpsolved.com/phpmyadmin-blowfish-secret-generator/
+            isp_mysql_ispconfig_password: "<CHANGE PASSWORD>"
+
+            #SSL Cert Settings
+            isp_ssl_cert_country: "CA"
+            isp_ssl_cert_state: "BC"
+            isp_ssl_cert_locality: "CA"
+            isp_ssl_cert_organisation: "NONE"
+            isp_ssl_cert_organisation_unit: "IT"
+            isp_cert_hostname: "<CHANGE HOSTNAME>"
+
+            #Expert Settings 
+
+            isp_enable_multiserver: "n"
+            isp_mysql_master_hostname: "master.weave.local"
+            isp_mysql_master_root_user: "root"
+            isp_mysql_master_root_password: "<CHANGE PASSWORD>"
+            isp_mysql_master_database: "dbispconfig"
+            isp_mysql_master_port: "3306"
+            isp_enable_mail: "n"
+            isp_enable_jailkit: "n"
+            isp_enable_ftp: "n"
+            isp_enable_dns: "n"
+            isp_enable_apache: "y"
+            isp_enable_nginx: "n"
+            isp_enable_firewall: "y"
+            isp_enable_webinterface: "y"
+
+            #Update Settings
+            isp_change_mail_server: "n"
+            isp_change_web_server: "n"
+            isp_change_dns_server: "n"
+            isp_change_xmpp_server: "n"
+            isp_change_firewall_server: "y"
+            isp_change_vserver_server: "n"
+            isp_change_db_server: "n"
+
             #Volume settings
             isp_host_dir: data
             isp_host_share: shared
             #server dir is set to isp_hostname
-                        
-            #Install Settings
-            isp_lang_settings: en
-            isp_hostname: <CHANGE HOSTNAME>
-            isp_mysql_hostname: master.weave.local
-            isp_mysql_port: 3306
-            isp_mysql_root_user: root
-            isp_mysql_root_password: "<CHANGE PASSWORD>"
-            isp_mysql_database: dbispconfig
-            isp_mysql_charset: utf8
-            isp_port: 8080
-            isp_use_ssl: y
-            isp_admin_password: "<CHANGE PASSWORD>"
-            isp_phpmyadmin_blowfish_secret: "<CHANGE Blowfish>"  ### Generate Blowfish secret https://phpsolved.com/phpmyadmin-blowfish-secret-generator/
-            isp_mysql_ispconfig_password: "<CHANGE PASSWORD>"
 
-            #SSL Cert Settings
-            isp_ssl_cert_country: DE
-            isp_ssl_cert_state: SH
-            isp_ssl_cert_locality: DE
-            isp_ssl_cert_organisation: NONE
-            isp_ssl_cert_organisation_unit: IT
-            isp_cert_hostname: <CHANGE HOSTNAME>
-
-            #Expert Settings 
-            isp_enable_multiserver: n
-            isp_mysql_master_hostname: master.weave.local
-            isp_mysql_master_root_user: root
-            isp_mysql_master_root_password: "<CHANGE PASSWORD>"
-            isp_mysql_master_database: dbispconfig
-            isp_mysql_master_port: 3306
-            isp_enable_mail: n
-            isp_enable_jailkit: n
-            isp_enable_ftp: n
-            isp_enable_dns: n
-            isp_enable_apache: y
-            isp_enable_nginx: n
-            isp_enable_firewall: y
-            isp_enable_webinterface: y
-
-            #Update Settings
-            isp_change_mail_server: n
-            isp_change_web_server: n
-            isp_change_dns_server: n
-            isp_change_xmpp_server: n
-            isp_change_firewall_server: y
-            isp_change_vserver_server: n
-            isp_change_db_server: n
 ###     Initial Installation only, execute Backup Script inside the Container before shutting down
         volumes: ["/${isp_host_dir}/${isp_hostname}/backup:/var/backup/","/${isp_host_dir}/${isp_hostname}/:/data/${isp_hostname}/"]
 ###     Make Data persistent, execute Move Script on host before starting containers    
