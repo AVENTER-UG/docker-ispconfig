@@ -1,6 +1,6 @@
 FROM ubuntu:focal
 
-MAINTAINER Andreas Peters <support@aventer.biz> version: 0.2
+LABEL Andreas Peters <support@aventer.biz> & Falko Luedtke <support@falkoinc.com> version: 0.3
 
 
 ARG TAG_SYN=master
@@ -13,8 +13,8 @@ ENV isp_mysql_port 3306
 ENV isp_mysql_root_user root
 ENV isp_mysql_root_password default
 ENV isp_mysql_database dbispconfig
-ENV isp_mysql_charset = utf8
-ENV isp__port = 8080
+ENV isp_mysql_charset utf8
+ENV isp_port 8080
 ENV isp_use_ssl y
 ENV isp_admin_password default
 
@@ -62,6 +62,9 @@ ENV isp_change_db_server y
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get -y update && apt-get -y upgrade && apt-get -y install quota quotatool software-properties-common quota mysql-client wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base git
+
+#Falko additions
+RUN apt-get -y install ntp mc iputils-ping
 
 # Remove sendmail
 RUN echo -n "Removing Sendmail... "	service sendmail stop hide_output update-rc.d -f sendmail remove apt_remove sendmail
@@ -181,7 +184,7 @@ ADD ./etc/clamav/clamd.conf /etc/clamav/clamd.conf
 
 RUN echo "export TERM=xterm" >> /root/.bashrc
 
-EXPOSE 53 80/tcp 443/tcp 953/tcp 8080/tcp 30000 30001 30002 30003 30004 30005 30006 30007 30008 30009 $isp_mysql_port
+EXPOSE 53 80/tcp 443/tcp 953/tcp $isp_port/tcp 30000 30001 30002 30003 30004 30005 30006 30007 30008 30009 $isp_mysql_port 
 
 
 
