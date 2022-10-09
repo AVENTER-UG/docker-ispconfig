@@ -19,7 +19,7 @@ services:
             #MYSQL_UNIX_PORT: "43306"
 
     panel:
-        image: git.ferp.local:3000/ferp/docker-ispconfig:f0.0.1
+        image: avhost/docker-ispconfig:3.2.8p1
         ports:
             - "8080:8080"
             - "8081:8081"
@@ -89,10 +89,10 @@ services:
             #server dir is set to isp_hostname
 
 ###     Initial Installation only, execute Backup Script inside the Container before shutting down
-        volumes: ["/${isp_host_dir}/${isp_hostname}/backup:/var/backup/","/${isp_host_dir}/${isp_hostname}/:/data/${isp_hostname}/"]
+        volumes: ["/data/panel/backup/:/var/backup/","/data/panel/:/data_tmp/"]
 ###     Make Data persistent, execute Move Script on host before starting containers    
-#        volumes: ["/${isp_host_dir}/${isp_hostname}/backup/:/var/backup/", "/${isp_host_dir}/${isp_hostname}/var/lib/amavis/:/var/lib/amavis/","/${isp_host_dir}/${isp_hostname}/etc/amavis/:/etc/amavis/", "/${isp_host_dir}/${isp_hostname}/etc/letsencrypt/:/etc/letsencrypt/", "/${isp_host_dir}/${isp_hostname}/etc/apache2/sites-available/:/etc/apache2/sites-available/", "/${isp_host_dir}/${isp_hostname}/etc/apache2/sites-enabled/:/etc/apache2/sites-enabled/", "/${isp_host_dir}/${isp_hostname}/usr/local/ispconfig/:/usr/local/ispconfig/", "/${isp_host_dir}/${isp_hostname}/etc/cron.d/:/etc/cron.d/", "/${isp_host_dir}/${isp_hostname}/etc/bind/:/etc/bind/", "/${isp_host_dir}/${isp_hostname}/var/vmail/:/var/vmail/", "/${isp_host_dir}/${isp_hostname}/var/www/:/var/www/"]
- 
+#        volumes: ["/data/panel/backup/:/var/backup/", "/data/panel/var/lib/amavis/:/var/lib/amavis/","/data/panel/etc/amavis/:/etc/amavis/", "/data/panel/etc/letsencrypt/:/etc/letsencrypt/", "/data/panel/etc/apache2/sites-available/:/etc/apache2/sites-available/", "/data/panel/etc/apache2/sites-enabled/:/etc/apache2/sites-enabled/", "/data/panel/usr/local/ispconfig/:/usr/local/ispconfig/", "/data/panel/etc/cron.d/:/etc/cron.d/", "/data/panel/etc/bind/:/etc/bind/", "/data/panel/var/vmail/:/var/vmail/", "/data/panel/var/www/:/var/www/"]
+  
 
 networks:
     default:
