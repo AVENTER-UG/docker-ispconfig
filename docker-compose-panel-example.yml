@@ -1,0 +1,98 @@
+version: '3'
+
+services:
+    master:
+        image: mariadb
+
+        command: --max_allowed_packet=32505856
+        restart: always
+        volumes:
+            - /data/db:/var/lib/mysql
+        networks:
+            default:
+                ipv4_address: 10.40.0.1
+        hostname: master.weave.local
+        environment:
+            MYSQL_ROOT_PASSWORD: "<CHANGE PASSWORD>"
+            #To run MySQL on different port
+            #MYSQL_TCP_PORT: "43306"
+            #MYSQL_UNIX_PORT: "43306"
+
+    panel:
+        image: git.ferp.local:3000/ferp/docker-ispconfig:f0.0.1
+        ports:
+            - "8080:8080"
+            - "8081:8081"
+        restart: always
+        depends_on:
+            - master
+        networks:
+            default:
+                ipv4_address: 10.40.0.2
+        hostname: panel.weave.local
+        cap_add:
+            - NET_ADMIN
+            - NET_RAW
+        environment:
+            #Volume settings
+            isp_host_dir: data
+            isp_host_share: shared
+            #server dir is set to isp_hostname
+                        
+            #Install Settings
+            isp_lang_settings: en
+            isp_hostname: <CHANGE HOSTNAME>
+            isp_mysql_hostname: master.weave.local
+            isp_mysql_port: 3306
+            isp_mysql_root_user: root
+            isp_mysql_root_password: "<CHANGE PASSWORD>"
+            isp_mysql_database: dbispconfig
+            isp_mysql_charset: utf8
+            isp_port: 8080
+            isp_use_ssl: y
+            isp_admin_password: "<CHANGE PASSWORD>"
+            isp_phpmyadmin_blowfish_secret: "<CHANGE Blowfish>"  ### Generate Blowfish secret https://phpsolved.com/phpmyadmin-blowfish-secret-generator/
+            isp_mysql_ispconfig_password: "<CHANGE PASSWORD>"
+
+            #SSL Cert Settings
+            isp_ssl_cert_country: DE
+            isp_ssl_cert_state: SH
+            isp_ssl_cert_locality: DE
+            isp_ssl_cert_organisation: NONE
+            isp_ssl_cert_organisation_unit: IT
+            isp_cert_hostname: <CHANGE HOSTNAME>
+
+            #Expert Settings 
+            isp_enable_multiserver: n
+            isp_mysql_master_hostname: master.weave.local
+            isp_mysql_master_root_user: root
+            isp_mysql_master_root_password: "<CHANGE PASSWORD>"
+            isp_mysql_master_database: dbispconfig
+            isp_mysql_master_port: 3306
+            isp_enable_mail: n
+            isp_enable_jailkit: n
+            isp_enable_ftp: n
+            isp_enable_dns: n
+            isp_enable_apache: y
+            isp_enable_nginx: n
+            isp_enable_firewall: y
+            isp_enable_webinterface: y
+
+            #Update Settings
+            isp_change_mail_server: n
+            isp_change_web_server: n
+            isp_change_dns_server: n
+            isp_change_xmpp_server: n
+            isp_change_firewall_server: y
+            isp_change_vserver_server: n
+            isp_change_db_server: n
+###     Initial Installation only, execute Backup Script inside the Container before shutting down
+        volumes: ["/${isp_host_dir}/${isp_hostname}/backup:/var/backup/","/${isp_host_dir}/${isp_hostname}/:/data/${isp_hostname}/"]
+###     Make Data persistent, execute Move Script on host before starting containers    
+#        volumes: ["/${isp_host_dir}/${isp_hostname}/backup/:/var/backup/", "/${isp_host_dir}/${isp_hostname}/var/lib/amavis/:/var/lib/amavis/","/${isp_host_dir}/${isp_hostname}/etc/amavis/:/etc/amavis/", "/${isp_host_dir}/${isp_hostname}/etc/letsencrypt/:/etc/letsencrypt/", "/${isp_host_dir}/${isp_hostname}/etc/apache2/sites-available/:/etc/apache2/sites-available/", "/${isp_host_dir}/${isp_hostname}/etc/apache2/sites-enabled/:/etc/apache2/sites-enabled/", "/${isp_host_dir}/${isp_hostname}/usr/local/ispconfig/:/usr/local/ispconfig/", "/${isp_host_dir}/${isp_hostname}/etc/cron.d/:/etc/cron.d/", "/${isp_host_dir}/${isp_hostname}/etc/bind/:/etc/bind/", "/${isp_host_dir}/${isp_hostname}/var/vmail/:/var/vmail/", "/${isp_host_dir}/${isp_hostname}/var/www/:/var/www/"]
+ 
+
+networks:
+    default:
+        external:
+            name: weave

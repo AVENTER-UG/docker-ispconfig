@@ -17,7 +17,8 @@ ENV isp_mysql_charset utf8
 ENV isp_port 8080
 ENV isp_use_ssl y
 ENV isp_admin_password default
-
+ENV isp_phpmyadmin_blowfish_secret "advpDZ9wHZXkZSfV78DLRjzSPaTm5yBC" 
+ENV isp_mysql_ispconfig_password default
 
 #SSL Cert Settings
 ENV isp_ssl_cert_country DE
@@ -29,7 +30,6 @@ ENV isp_cert_hostname localhost
 
 
 #Expert Settings 
-ENV isp_mysql_ispconfig_password default
 ENV isp_enable_multiserver n
 ENV isp_mysql_master_hostname localhost
 ENV isp_mysql_master_root_user root
@@ -47,10 +47,6 @@ ENV isp_enable_webinterface y
 
 
 #Update Settings
-ENV isp_enable_multiserver n
-ENV isp_hostname localhost
-ENV isp_cert_hostname localhost
-ENV isp_use_ssl y
 ENV isp_change_mail_server y
 ENV isp_change_web_server y
 ENV isp_change_dns_server y
