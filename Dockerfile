@@ -2,7 +2,6 @@ FROM ubuntu:focal
 
 LABEL Andreas Peters <support@aventer.biz> & Falko Luedtke <support@falkoinc.com> version: 0.3
 
-
 ARG TAG_SYN=master
 
 #Install Settings
