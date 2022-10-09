@@ -2,6 +2,7 @@ FROM ubuntu:focal
 
 LABEL Andreas Peters <support@aventer.biz> & Falko Luedtke <support@falkoinc.com> version: 0.3
 
+
 ARG TAG_SYN=master
 
 #Install Settings
@@ -46,6 +47,10 @@ ENV isp_enable_webinterface y
 
 
 #Update Settings
+ENV isp_enable_multiserver n
+ENV isp_hostname localhost
+ENV isp_cert_hostname localhost
+ENV isp_use_ssl y
 ENV isp_change_mail_server y
 ENV isp_change_web_server y
 ENV isp_change_dns_server y
@@ -66,7 +71,6 @@ RUN echo -n "Removing Sendmail... "	service sendmail stop hide_output update-rc.
 
 # Install OpenSSH 
 RUN apt-get -y install ssh openssh-server rsync
-
 
 # Install Postfix, Dovecot, rkhunter, binutils
 RUN echo -n "Installing SMTP Mail server (Postfix)... " \
