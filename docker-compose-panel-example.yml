@@ -50,9 +50,9 @@ services:
             isp_mysql_ispconfig_password: "<CHANGE PASSWORD>"
 
             #SSL Cert Settings
-            isp_ssl_cert_country: "CA"
-            isp_ssl_cert_state: "BC"
-            isp_ssl_cert_locality: "CA"
+            isp_ssl_cert_country: "DE"
+            isp_ssl_cert_state: "SH"
+            isp_ssl_cert_locality: "DE"
             isp_ssl_cert_organisation: "NONE"
             isp_ssl_cert_organisation_unit: "IT"
             isp_cert_hostname: "<CHANGE HOSTNAME>"
@@ -75,13 +75,13 @@ services:
             isp_enable_webinterface: "y"
 
             #Update Settings
-            isp_change_mail_server: "n"
-            isp_change_web_server: "n"
-            isp_change_dns_server: "n"
-            isp_change_xmpp_server: "n"
+            isp_change_mail_server: "y"
+            isp_change_web_server: "y"
+            isp_change_dns_server: "y"
+            isp_change_xmpp_server: "y"
             isp_change_firewall_server: "y"
-            isp_change_vserver_server: "n"
-            isp_change_db_server: "n"
+            isp_change_vserver_server: "y"
+            isp_change_db_server: "y"
 
             #Volume settings
             isp_host_dir: data
