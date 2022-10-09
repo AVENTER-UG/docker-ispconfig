@@ -1,20 +1,41 @@
 FROM ubuntu:focal
 
-MAINTAINER Andreas Peters <support@aventer.biz> version: 0.2
+LABEL Andreas Peters <support@aventer.biz> & Falko Luedtke <support@falkoinc.com> version: 0.3
+
 
 ARG TAG_SYN=master
 
+#Install Settings
+ENV isp_lang_settings en
+ENV isp_hostname localhost
 ENV isp_mysql_hostname localhost
 ENV isp_mysql_port 3306
 ENV isp_mysql_root_user root
 ENV isp_mysql_root_password default
 ENV isp_mysql_database dbispconfig
+ENV isp_mysql_charset = utf8
+ENV isp__port = 8080
+ENV isp_use_ssl y
+ENV isp_admin_password default
+
+
+#SSL Cert Settings
+ENV isp_ssl_cert_country DE
+ENV isp_ssl_cert_state SH
+ENV isp_ssl_cert_locality DE
+ENV isp_ssl_cert_organisation NONE
+ENV isp_ssl_cert_organisation_unit IT
+ENV isp_cert_hostname localhost
+
+
+#Expert Settings 
 ENV isp_mysql_ispconfig_password default
+ENV isp_enable_multiserver n
+ENV isp_mysql_master_hostname localhost
 ENV isp_mysql_master_root_user root
 ENV isp_mysql_master_root_password default
-ENV isp_mysql_master_hostname localhost
 ENV isp_mysql_master_database dbispconfig
-ENV isp_admin_password default
+ENV isp_mysql_master_port 3306
 ENV isp_enable_mail n
 ENV isp_enable_jailkit n
 ENV isp_enable_ftp n
@@ -23,10 +44,9 @@ ENV isp_enable_apache y
 ENV isp_enable_nginx y
 ENV isp_enable_firewall y
 ENV isp_enable_webinterface y
-ENV isp_enable_multiserver n
-ENV isp_hostname localhost
-ENV isp_cert_hostname localhost
-ENV isp_use_ssl y
+
+
+#Update Settings
 ENV isp_change_mail_server y
 ENV isp_change_web_server y
 ENV isp_change_dns_server y
@@ -38,6 +58,9 @@ ENV isp_change_db_server y
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get -y update && apt-get -y upgrade && apt-get -y install quota quotatool software-properties-common quota mysql-client wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base git
+
+#Falko additions
+RUN apt-get -y install ntp mc iputils-ping
 
 # Remove sendmail
 RUN echo -n "Removing Sendmail... "	service sendmail stop hide_output update-rc.d -f sendmail remove apt_remove sendmail
@@ -91,6 +114,12 @@ RUN apt-get -y install php7.4-opcache php-apcu
 
 # PHP 7.4 FPM
 RUN apt-get -y install php7.4-fpm
+
+# Mod PageSpeed
+RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb 
+RUN dpkg -i mod-pagespeed-stable_current_amd64.deb 
+RUN apt-get -f install 
+RUN a2enmod deflate mime_magic 
 
 RUN a2enmod actions proxy_fcgi alias 
 RUN service apache2 stop
@@ -152,7 +181,7 @@ ADD ./etc/clamav/clamd.conf /etc/clamav/clamd.conf
 
 RUN echo "export TERM=xterm" >> /root/.bashrc
 
-EXPOSE 53 80/tcp 443/tcp 953/tcp 8080/tcp 30000 30001 30002 30003 30004 30005 30006 30007 30008 30009 $isp_mysql_port
+EXPOSE 53 80/tcp 443/tcp 953/tcp 8080/tcp 30000 30001 30002 30003 30004 30005 30006 30007 30008 30009 $isp_mysql_port $isp__port
 
 
 
