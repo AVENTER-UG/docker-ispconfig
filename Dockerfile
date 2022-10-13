@@ -179,3 +179,11 @@ ADD ./etc/logrotate/rsyslog-rotate /usr/lib/rsyslog/rsyslog-rotate
 VOLUME ["/usr/local/ispconfig/"]
 
 CMD ["/bin/bash", "/start.sh"]
+
+RUN if [ -f "/var/backup/1st-backup-complete.log" ]; then \
+    echo "1st Backup file exists. Nothing to do here" \
+else \
+    echo "Waiting for 30 sec to ensure install is completed before doing the backup" \
+    Sleep 30 \
+    CMD ["/bin/bash", "/do-1st-backup.sh"] \
+fi
