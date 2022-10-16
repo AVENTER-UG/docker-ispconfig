@@ -178,12 +178,10 @@ ADD ./etc/logrotate/rsyslog-rotate /usr/lib/rsyslog/rsyslog-rotate
 
 VOLUME ["/usr/local/ispconfig/"]
 
-CMD ["/bin/bash", "/start.sh"]
+## Initial Backup
+ADD ./do-1st-backup.sh /do-1st-backup.sh
 
-RUN if [ -f "/var/backup/1st-backup-complete.log" ]; then \
-    echo "1st Backup file exists. Nothing to do here" \
-else \
-    echo "Waiting for 30 sec to ensure install is completed before doing the backup" \
-    Sleep 30 \
-    CMD ["/bin/bash", "/do-1st-backup.sh"] \
-fi
+## FIX: mysqldump Error: Unknown table ‘COLUMN_STATISTICS’ in information_schema (1109)
+RUN echo "column-statistics=0" >> /etc/mysql/conf.d/mysqldump.cnf 
+
+CMD ["/bin/bash", "/start.sh"]

@@ -10,6 +10,8 @@ cd /tmp/ispconfig3_install/install/
 
 if [ -f /usr/local/ispconfig/interface/lib/config.inc.php ]; 
 then
+  # Fixed: Table already exists
+  rm /tmp/ispconfig3_install/install/sql/incremental/upd_dev_collection.sql
 	/wait-for-it.sh $isp_mysql_hostname:$isp_mysql_port -- php -q update.php --autoinstall=/tmp/ispconfig3_install/install/autoinstall.ini
 else
 	/wait-for-it.sh $isp_mysql_hostname:$isp_mysql_port -- php -q install.php --autoinstall=/tmp/ispconfig3_install/install/autoinstall.ini
@@ -78,5 +80,12 @@ unset isp_mysql_database
 chown root:bind /etc/bind/rndc.key
 # fix index permission error
 chown courier: /etc/courier/shared/index
+
+if [ -f "/var/backup/1st-backup-complete.log" ]; 
+then 
+    echo "1st Backup file exists. Nothing to do here" 
+else 
+    /do-1st-backup.sh &
+fi
 
 /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
