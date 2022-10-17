@@ -178,4 +178,10 @@ ADD ./etc/logrotate/rsyslog-rotate /usr/lib/rsyslog/rsyslog-rotate
 
 VOLUME ["/usr/local/ispconfig/"]
 
+## Initial Backup
+ADD ./do-1st-backup.sh /do-1st-backup.sh
+
+## FIX: mysqldump Error: Unknown table ‘COLUMN_STATISTICS’ in information_schema (1109)
+RUN echo "column-statistics=0" >> /etc/mysql/conf.d/mysqldump.cnf 
+
 CMD ["/bin/bash", "/start.sh"]
