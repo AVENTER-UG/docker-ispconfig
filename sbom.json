@@ -2,6 +2,7 @@
  "artifacts": [],
  "artifactRelationships": [],
  "source": {
+  "id": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
   "type": "directory",
   "target": "."
  },
@@ -19,20 +20,13 @@
    "output-template-path": "",
    "file": "",
    "check-for-app-update": true,
-   "anchore": {
-    "host": "",
-    "path": "",
-    "dockerfile": "",
-    "overwrite-existing-image": false,
-    "import-timeout": 30
-   },
    "dev": {
     "profile-cpu": false,
     "profile-mem": false
    },
    "log": {
     "structured": false,
-    "level": "warning",
+    "level": "warn",
     "file-location": ""
    },
    "catalogers": null,
@@ -44,6 +38,7 @@
     "search-unindexed-archives": false,
     "search-indexed-archives": true
    },
+   "attest": {},
    "file-metadata": {
     "cataloger": {
      "enabled": false,
@@ -83,26 +78,13 @@
     "auth": []
    },
    "exclude": [],
-   "attest": {
-    "key": "",
-    "cert": "",
-    "noUpload": false,
-    "force": false,
-    "recursive": false,
-    "replace": false,
-    "fulcioUrl": "https://fulcio.sigstore.dev",
-    "fulcio_identity_token": "",
-    "insecure_skip_verify": false,
-    "rekorUrl": "https://rekor.sigstore.dev",
-    "oidcIssuer": "https://oauth2.sigstore.dev/auth",
-    "oidcClientId": "sigstore",
-    "OIDCRedirectURL": ""
-   },
-   "platform": ""
+   "platform": "",
+   "name": "",
+   "parallelism": 1
   }
  },
  "schema": {
-  "version": "3.3.1",
-  "url": "https://raw.githubusercontent.com/anchore/syft/main/schema/json/schema-3.3.1.json"
+  "version": "7.0.1",
+  "url": "https://raw.githubusercontent.com/anchore/syft/main/schema/json/schema-7.0.1.json"
  }
 }

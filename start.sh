@@ -68,6 +68,11 @@ then
   /etc/init.d/php7.4-fpm start
 fi
 
+if [ "$isp_enable_jailkit" == "y" ];
+then
+  /etc/init.d/sshd start
+fi
+
 /etc/init.d/cron restart
 
 unset isp_mysql_root_password

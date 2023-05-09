@@ -1,10 +1,14 @@
 FROM ubuntu:focal
 
-MAINTAINER Andreas Peters <support@aventer.biz> version: 0.2
+LABEL maintainer="Andreas Peters <support@aventer.biz>"
+LABEL org.opencontainers.image.title="docker-ispconfig"
+LABEL org.opencontainers.image.description="This docker image include a whole ISPConfig3 software stack!"
+LABEL org.opencontainers.image.vendor="AVENTER UG (haftungsbeschränkt)"
+LABEL org.opencontainers.image.source="https://github.com/AVENTER-UG/docker-ispconfig"
 
 ARG TAG_SYN=master
 
-ENV isp_mysql_hostname localhost
+ENV isp_mysql_hostname master
 ENV isp_mysql_port 3306
 ENV isp_mysql_root_user root
 ENV isp_mysql_root_password default
@@ -109,16 +113,7 @@ RUN apt-get -y install vlogger webalizer awstats geoip-database libclass-dbi-mys
 ADD etc/cron.d/awstats /etc/cron.d/
 
 # Install Jailkit
-RUN apt-get -y install build-essential autoconf automake libtool flex bison debhelper binutils python
-RUN cd /tmp \
-&& wget http://olivier.sessink.nl/jailkit/jailkit-2.19.tar.gz \
-&& tar xvfz jailkit-2.19.tar.gz \
-&& cd jailkit-2.19 \
-&& echo 5 > debian/compat \
-&& ./debian/rules binary \
-&& make install \
-&& cd /tmp \
-&& rm -rf jailkit-2.19*
+RUN apt-get -y install build-essential autoconf automake libtool flex bison debhelper binutils python jailkit
 
 # Install fail2ban
 RUN apt-get -y install fail2ban 
@@ -148,6 +143,10 @@ ADD ./update.php /tmp/ispconfig3_install/install/update.php
 ADD ./install.php /tmp/ispconfig3_install/install/install.php
 
 ADD ./etc/postfix/master.cf /etc/postfix/master.cf
+
+ADD ./etc/postfix/client_checks /etc/postfix/client_checks
+RUN postmap /etc/postfix/client_checks
+
 ADD ./etc/clamav/clamd.conf /etc/clamav/clamd.conf
 
 RUN echo "export TERM=xterm" >> /root/.bashrc
