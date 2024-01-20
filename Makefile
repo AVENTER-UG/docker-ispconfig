@@ -5,6 +5,8 @@ TAG=3.2.8p1_av2
 IMAGENAME=docker-ispconfig
 IMAGEFULLNAME=avhost/${IMAGENAME}
 BRANCH=${shell git symbolic-ref --short HEAD}
+LASTCOMMIT=$(shell git log -1 --pretty=short | tail -n 1 | tr -d " " | tr -d "UPDATE:")
+
 
 help:
 	    @echo "Makefile arguments:"
