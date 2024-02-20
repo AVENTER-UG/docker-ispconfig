@@ -7,6 +7,10 @@ output=/var/backup/1st-backup-complete.log
 
 if [ ! -f "$output" ]
 then
+    if [ ! -f "/data_tmp" ]
+    then
+        mkdir /data_tmp/
+    fi
     echo "Waiting for 30 sec to ensure install is completed before doing the backup" 
     sleep 30 
     cp -r --parents /var/lib/amavis/ /data_tmp/
