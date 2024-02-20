@@ -1,6 +1,1 @@
-NAME                        VERSION  TYPE          
-actions/checkout            v2       github-action  
-docker/build-push-action    v2       github-action  
-docker/login-action         v1       github-action  
-docker/setup-buildx-action  v1       github-action  
-docker/setup-qemu-action    v1       github-action
+No packages discovered

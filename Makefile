@@ -1,7 +1,7 @@
 #Dockerfile vars
 
 #vars
-TAG=3.2.11p1
+TAG=3.2.11p2
 IMAGENAME=docker-ispconfig
 IMAGEFULLNAME=avhost/${IMAGENAME}
 BRANCH=${shell git symbolic-ref --short HEAD}

@@ -100,8 +100,3 @@ Yes its working! We are using it with weave.works and docker-compose. At the hos
 
 It's definitly not a microservice. :-) So, you cannot recreate the running container like you want and to everytime. You need a downtime, and maybe you also have so cleanup a little bit after you restart the container.
 
-# Sponsors
-
-Thanks to my sponsor.
-
-![FERB](https://avatars.githubusercontent.com/u/98983967?s=60&v=4)

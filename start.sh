@@ -60,12 +60,12 @@ fi
 
 if [ "$isp_enable_nginx" == "y" ];
 then
-  /etc/init.d/php7.4-fpm start
+  /etc/init.d/php8.1-fpm start
 fi
 
 if [ "$isp_enable_apache" == "y" ];
 then
-  /etc/init.d/php7.4-fpm start
+  /etc/init.d/php8.1-fpm start
 fi
 
 if [ "$isp_enable_jailkit" == "y" ];

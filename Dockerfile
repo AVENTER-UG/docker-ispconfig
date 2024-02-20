@@ -6,7 +6,7 @@ LABEL org.opencontainers.image.description="This docker image include a whole IS
 LABEL org.opencontainers.image.vendor="AVENTER UG (haftungsbeschränkt)"
 LABEL org.opencontainers.image.source="https://github.com/AVENTER-UG/docker-ispconfig"
 
-ARG TAG_SYN=v3.2.11p
+ARG TAG_SYN=update-3.2.11p2
 
 ENV isp_mysql_hostname master
 ENV isp_mysql_port 3306
