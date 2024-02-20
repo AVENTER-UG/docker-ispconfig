@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:jammy
 
 LABEL maintainer="Andreas Peters <support@aventer.biz>"
 LABEL org.opencontainers.image.title="docker-ispconfig"
@@ -6,7 +6,7 @@ LABEL org.opencontainers.image.description="This docker image include a whole IS
 LABEL org.opencontainers.image.vendor="AVENTER UG (haftungsbeschränkt)"
 LABEL org.opencontainers.image.source="https://github.com/AVENTER-UG/docker-ispconfig"
 
-ARG TAG_SYN=master
+ARG TAG_SYN=v3.2.11p
 
 ENV isp_mysql_hostname master
 ENV isp_mysql_port 3306
@@ -73,7 +73,7 @@ RUN touch /usr/share/man/man5/maildir.maildrop.5.gz \
     && touch /usr/share/man/man7/maildirquota.maildrop.7.gz \
     && apt-get install -y maildrop
 
-RUN apt-get -y install postfix mysql-client postfix-mysql postfix-doc openssl getmail4 rkhunter binutils courier-authlib-mysql courier-pop courier-pop courier-imap courier-imap libsasl2-2 libsasl2-modules libsasl2-modules-sql sasl2-bin libpam-mysql sudo gamin
+RUN apt-get -y install postfix mysql-client postfix-mysql postfix-doc openssl getmail6 rkhunter binutils courier-authlib-mysql courier-pop courier-pop courier-imap courier-imap libsasl2-2 libsasl2-modules libsasl2-modules-sql sasl2-bin libpam-mysql sudo gamin
 ADD ./etc/postfix/master.cf /etc/postfix/master.cf
 ADD ./etc/security/limits.conf /etc/security/limits.conf
 ADD ./etc/courier/authmysqlrc.ini /root/authmysqlrc.ini
@@ -85,16 +85,16 @@ ADD ./etc/clamav/clamd.conf /etc/clamav/clamd.conf
 RUN service spamassassin stop 
 RUN service clamav-daemon stop 
 # Install Apache2, PHP, FCGI, suExec, Pear, And mcrypt
-RUN apt-get -y install apache2 apache2-doc apache2-utils libapache2-mod-php php7.4 php7.4-common php7.4-gd php7.4-mysql php7.4-imap php7.4-cli php7.4-cgi libapache2-mod-fcgid apache2-suexec-pristine php-pear mcrypt  imagemagick libruby libapache2-mod-python php7.4-curl php7.4-intl php7.4-pspell php7.4-sqlite3 php7.4-tidy php7.4-xmlrpc php7.4-xsl memcached php-memcache php-imagick php7.4-zip php7.4-mbstring php-soap php7.4-soap
+RUN apt-get -y install apache2 apache2-doc apache2-utils libapache2-mod-php php8.1 php8.1-common php8.1-gd php8.1-mysql php8.1-imap php8.1-cli php8.1-cgi libapache2-mod-fcgid apache2-suexec-pristine php-pear mcrypt  imagemagick libruby libapache2-mod-python php8.1-curl php8.1-intl php8.1-pspell php8.1-sqlite3 php8.1-tidy php8.1-xmlrpc php8.1-xsl memcached php-memcache php-imagick php8.1-zip php8.1-mbstring php-soap php8.1-soap
 RUN echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf && a2enconf servername
 ADD ./etc/apache2/conf-available/httpoxy.conf /etc/apache2/conf-available/httpoxy.conf
 RUN a2enmod suexec rewrite ssl actions include dav_fs dav auth_digest cgi headers && a2enconf httpoxy && a2dissite 000-default && service apache2 restart
 
 # PHP Opcode cache
-RUN apt-get -y install php7.4-opcache php-apcu
+RUN apt-get -y install php8.1-opcache php-apcu
 
 # PHP 7.4 FPM
-RUN apt-get -y install php7.4-fpm
+RUN apt-get -y install php8.1-fpm
 
 RUN a2enmod actions proxy_fcgi alias 
 RUN service apache2 stop
@@ -113,7 +113,7 @@ RUN apt-get -y install vlogger webalizer awstats geoip-database libclass-dbi-mys
 ADD etc/cron.d/awstats /etc/cron.d/
 
 # Install Jailkit
-RUN apt-get -y install build-essential autoconf automake libtool flex bison debhelper binutils python jailkit
+RUN apt-get -y install build-essential autoconf automake libtool flex bison debhelper binutils python3 jailkit
 
 # Install fail2ban
 RUN apt-get -y install fail2ban 
