@@ -6,7 +6,7 @@ LABEL org.opencontainers.image.description="This docker image include a whole IS
 LABEL org.opencontainers.image.vendor="AVENTER UG (haftungsbeschränkt)"
 LABEL org.opencontainers.image.source="https://github.com/AVENTER-UG/docker-ispconfig"
 
-ARG TAG_SYN=update-3.2.11p2
+ARG TAG_SYN=v3.2.11p2
 
 ENV isp_mysql_hostname master
 ENV isp_mysql_port 3306
@@ -24,7 +24,7 @@ ENV isp_enable_jailkit n
 ENV isp_enable_ftp n
 ENV isp_enable_dns y
 ENV isp_enable_apache y
-ENV isp_enable_nginx y
+ENV isp_enable_nginx n
 ENV isp_enable_firewall y
 ENV isp_enable_webinterface y
 ENV isp_enable_multiserver n
@@ -38,6 +38,8 @@ ENV isp_change_xmpp_server y
 ENV isp_change_firewall_server y
 ENV isp_change_vserver_server y
 ENV isp_change_db_server y
+ENV firewall_server_enabled n
+ENV xmpp_server_enabled n
 
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -182,5 +184,7 @@ ADD ./do-1st-backup.sh /do-1st-backup.sh
 
 ## FIX: mysqldump Error: Unknown table ‘COLUMN_STATISTICS’ in information_schema (1109)
 RUN echo "column-statistics=0" >> /etc/mysql/conf.d/mysqldump.cnf 
+
+RUN echo START="yes" >> /etc/default/saslauthd
 
 CMD ["/bin/bash", "/start.sh"]
