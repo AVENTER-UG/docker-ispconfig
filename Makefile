@@ -35,6 +35,7 @@ build:
 push:
 	@echo ">>>> Publish docker image: " ${TAG}_${BRANCH}
 	@docker build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${TAG}_${BRANCH} .
+	@docker build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
 
 seccheck:
 	grype --add-cpes-if-none dir:.
