@@ -1,7 +1,7 @@
 #Dockerfile vars
 
 #vars
-TAG=3.2.8p1_av2
+TAG=v3.2.11p2
 IMAGENAME=docker-ispconfig
 IMAGEFULLNAME=avhost/${IMAGENAME}
 BRANCH=${shell git symbolic-ref --short HEAD}
@@ -29,12 +29,12 @@ else
 endif
 
 build:
-	@echo ">>>> Build docker image: " ${BRANCH}
-	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
+	@echo ">>>> Build docker image: " ${TAG}_${BRANCH}
+	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${TAG}_${BRANCH} .
 
 push:
-	@echo ">>>> Publish docker image: " ${BRANCH}
-	@docker build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
+	@echo ">>>> Publish docker image: " ${TAG}_${BRANCH}
+	@docker build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${TAG}_${BRANCH} .
 
 seccheck:
 	grype --add-cpes-if-none dir:.
