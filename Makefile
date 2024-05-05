@@ -33,7 +33,8 @@ build:
 	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
 
 push:
-	@echo ">>>> Publish docker image: " ${BRANCH}
+	@echo ">>>> Publish docker image: " ${TAG}_${BRANCH}
+	@docker build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${TAG}_${BRANCH} .
 	@docker build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
 	@docker build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
 
