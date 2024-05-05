@@ -87,7 +87,7 @@ ADD ./etc/clamav/clamd.conf /etc/clamav/clamd.conf
 RUN service spamassassin stop 
 RUN service clamav-daemon stop 
 # Install Apache2, PHP, FCGI, suExec, Pear, And mcrypt
-RUN apt-get -y install apache2 apache2-doc apache2-utils libapache2-mod-php php8.1 php8.1-common php8.1-gd php8.1-mysql php8.1-imap php8.1-cli php8.1-cgi libapache2-mod-fcgid apache2-suexec-pristine php-pear mcrypt  imagemagick libruby libapache2-mod-python php8.1-curl php8.1-intl php8.1-pspell php8.1-sqlite3 php8.1-tidy php8.1-xmlrpc php8.1-xsl memcached php-memcache php-imagick php8.1-zip php8.1-mbstring php-soap php8.1-soap
+RUN apt-get -y update && apt-get -y install apache2 apache2-doc apache2-utils libapache2-mod-php php8.1 php8.1-common php8.1-gd php8.1-mysql php8.1-imap php8.1-cli php8.1-cgi libapache2-mod-fcgid apache2-suexec-pristine php-pear mcrypt  imagemagick libruby libapache2-mod-python php8.1-curl php8.1-intl php8.1-pspell php8.1-sqlite3 php8.1-tidy php8.1-xmlrpc php8.1-xsl memcached php-memcache php-imagick php8.1-zip php8.1-mbstring php-soap php8.1-soap
 RUN echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf && a2enconf servername
 ADD ./etc/apache2/conf-available/httpoxy.conf /etc/apache2/conf-available/httpoxy.conf
 RUN a2enmod suexec rewrite ssl actions include dav_fs dav auth_digest cgi headers && a2enconf httpoxy && a2dissite 000-default && service apache2 restart

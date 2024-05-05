@@ -29,8 +29,8 @@ else
 endif
 
 build:
-	@echo ">>>> Build docker image: latest"
-	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
+	@echo ">>>> Build docker image: " ${BRANCH}
+	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
 
 push:
 	@echo ">>>> Publish docker image: " ${TAG}_${BRANCH}
