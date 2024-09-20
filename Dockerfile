@@ -183,4 +183,7 @@ ADD ./do-1st-backup.sh /do-1st-backup.sh
 ## FIX: mysqldump Error: Unknown table ‘COLUMN_STATISTICS’ in information_schema (1109)
 RUN echo "column-statistics=0" >> /etc/mysql/conf.d/mysqldump.cnf 
 
+## FIX: Postgrey listening interface
+ADD ./etc/default/postgrey /etc/default/postgrey
+
 CMD ["/bin/bash", "/start.sh"]

@@ -93,4 +93,6 @@ else
     /do-1st-backup.sh &
 fi
 
+/etc/init.d/postgrey start
+
 /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
