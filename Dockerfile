@@ -38,6 +38,7 @@ ENV isp_change_xmpp_server y
 ENV isp_change_firewall_server y
 ENV isp_change_vserver_server y
 ENV isp_change_db_server y
+ENV isp_postfix_protocols ipv4
 
 
 ENV DEBIAN_FRONTEND noninteractive
