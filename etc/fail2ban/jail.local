@@ -1,3 +1,7 @@
+[DEFAULT]
+banaction = nftables
+banaction_allports = nftables[type=allports]
+
 [pure-ftpd]
 bantime=60m
 findtime=60m
@@ -23,4 +27,35 @@ port = smtp
 filter = postfix-sasl
 logpath = /var/log/mail.log
 maxretry = 3
+
+[apache]
+enabled  = true
+port     = http,https
+filter   = apache-auth
+# logpath  = /var/log/apache*/*error.log
+logpath  = /var/log/ispconfig/httpd/*/*.log
+findtime = 3600
+maxretry = 3
+bantime  = 86400
+
+[php-url-fopen]
+enabled  = true
+port    = http,https
+logpath = /var/log/ispconfig/httpd/*/*.log
+
+[postfix]
+# To use another modes set filter parameter "mode" in jail.local:
+enabled  = true
+mode    = more
+port    = smtp,465,submission
+logpath = %(postfix_log)s
+backend = %(postfix_backend)s
+
+[named-refused]
+enabled  = true
+port     = domain,953 
+logpath  = /var/log/syslog
+maxretry = 3
+bantime = 600m
+
 
