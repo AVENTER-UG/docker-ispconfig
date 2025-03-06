@@ -7,6 +7,11 @@
 
 This docker image include a whole ISPConfig3 software stack. For details, I'm sorry have a look in the Dockerfile. Later I will write down all installed packages.
 
+## Funding
+
+[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=H553XE4QJ9GJ8)
+
+
 ## How to use it
 
 First, have a look at the following docker-compose file to get an idea.

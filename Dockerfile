@@ -40,6 +40,7 @@ ENV isp_change_vserver_server y
 ENV isp_change_db_server y
 ENV firewall_server_enabled n
 ENV xmpp_server_enabled n
+ENV isp_postfix_protocols ipv4
 
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -120,8 +121,7 @@ RUN apt-get -y install build-essential autoconf automake libtool flex bison debh
 # Install fail2ban
 RUN apt-get -y install fail2ban 
 ADD ./etc/fail2ban/jail.local /etc/fail2ban/jail.local
-ADD ./etc/fail2ban/filter.d/pureftpd.conf /etc/fail2ban/filter.d/pureftpd.conf
-ADD ./etc/fail2ban/filter.d/postfix-sasl.conf /etc/fail2ban/filter.d/postfix-sasl.conf
+ADD ./etc/fail2ban/filter.d/* /etc/fail2ban/filter.d/
 
 # Install Let's Encrypt
 RUN apt-get -y install python3-certbot-apache
@@ -186,5 +186,8 @@ ADD ./do-1st-backup.sh /do-1st-backup.sh
 RUN echo "column-statistics=0" >> /etc/mysql/conf.d/mysqldump.cnf 
 
 RUN echo START="yes" >> /etc/default/saslauthd
+
+## FIX: Postgrey listening interface
+ADD ./etc/default/postgrey /etc/default/postgrey
 
 CMD ["/bin/bash", "/start.sh"]

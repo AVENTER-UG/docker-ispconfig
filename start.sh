@@ -23,6 +23,8 @@ chown -R amavis: /var/lib/amavis/
 #sed -i "s/^hosts .*$/hosts = $isp_mysql_hostname/g" /etc/postfix/mysql-virtual_outgoing_bcc.cf
 sed -i "s/^myhostname = .*$/myhostname = $isp_hostname/g" /etc/postfix/main.cf
 echo message_size_limit=52428800 >> /etc/postfix/main.cf
+sed -i "s/^inet_protocols = .*$/inet_protocols = $isp_postfix_protocols/g" /etc/postfix/main.cf
+sed -i "s/, check_policy_service unix:private\/quota-status$//g" /etc/postfix/main.cf
 
 #echo "UPDATE mysql.user SET Host = '%' WHERE User like 'ispc%';" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
 #echo "UPDATE mysql.db SET Host = '%' WHERE User like 'ispc%';" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
@@ -92,5 +94,7 @@ then
 else 
     /do-1st-backup.sh &
 fi
+
+/etc/init.d/postgrey start
 
 /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
