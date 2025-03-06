@@ -119,8 +119,7 @@ RUN apt-get -y install build-essential autoconf automake libtool flex bison debh
 # Install fail2ban
 RUN apt-get -y install fail2ban 
 ADD ./etc/fail2ban/jail.local /etc/fail2ban/jail.local
-ADD ./etc/fail2ban/filter.d/pureftpd.conf /etc/fail2ban/filter.d/pureftpd.conf
-ADD ./etc/fail2ban/filter.d/postfix-sasl.conf /etc/fail2ban/filter.d/postfix-sasl.conf
+ADD ./etc/fail2ban/filter.d/* /etc/fail2ban/filter.d/
 
 # Install Let's Encrypt
 RUN apt-get -y install python3-certbot-apache
