@@ -35,7 +35,7 @@ seccheck:
 	grype --add-cpes-if-none dir:.
 
 imagecheck:
-	trivy image ${IMAGEFULLNAME}:${BRANCH} 
+	frype --add-cpes-if-none ${IMAGEFULLNAME}:${BRANCH} > cve-report.md
 
 sboom:
 	syft dir:. > sbom.txt
