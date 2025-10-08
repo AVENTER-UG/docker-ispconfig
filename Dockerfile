@@ -8,40 +8,39 @@ LABEL org.opencontainers.image.source="https://github.com/AVENTER-UG/docker-ispc
 
 ARG TAG_SYN=master
 
-ENV isp_mysql_hostname master
-ENV isp_mysql_port 3306
-ENV isp_mysql_root_user root
-ENV isp_mysql_root_password default
-ENV isp_mysql_database dbispconfig
-ENV isp_mysql_ispconfig_password default
-ENV isp_mysql_master_root_user root
-ENV isp_mysql_master_root_password default
-ENV isp_mysql_master_hostname localhost
-ENV isp_mysql_master_database dbispconfig
-ENV isp_admin_password default
-ENV isp_enable_mail n
-ENV isp_enable_jailkit n
-ENV isp_enable_ftp n
-ENV isp_enable_dns y
-ENV isp_enable_apache y
-ENV isp_enable_nginx y
-ENV isp_enable_firewall y
-ENV isp_enable_webinterface y
-ENV isp_enable_multiserver n
-ENV isp_hostname localhost
-ENV isp_cert_hostname localhost
-ENV isp_use_ssl y
-ENV isp_change_mail_server y
-ENV isp_change_web_server y
-ENV isp_change_dns_server y
-ENV isp_change_xmpp_server y
-ENV isp_change_firewall_server y
-ENV isp_change_vserver_server y
-ENV isp_change_db_server y
-ENV isp_postfix_protocols ipv4
+ENV isp_mysql_hostname=master
+ENV isp_mysql_port=3306
+ENV isp_mysql_root_user=root
+ENV isp_mysql_root_password=default
+ENV isp_mysql_database=dbispconfig
+ENV isp_mysql_ispconfig_password=default
+ENV isp_mysql_master_root_user=root
+ENV isp_mysql_master_root_password=default
+ENV isp_mysql_master_hostname=localhost
+ENV isp_mysql_master_database=dbispconfig
+ENV isp_admin_password=default
+ENV isp_enable_mail=n
+ENV isp_enable_jailkit=n
+ENV isp_enable_ftp=n
+ENV isp_enable_dns=y
+ENV isp_enable_apache=y
+ENV isp_enable_nginx=y
+ENV isp_enable_firewall=y
+ENV isp_enable_webinterface=y
+ENV isp_enable_multiserver=n
+ENV isp_hostname=localhost
+ENV isp_cert_hostname=localhost
+ENV isp_use_ssl=y
+ENV isp_change_mail_server=y
+ENV isp_change_web_server=y
+ENV isp_change_dns_server=y
+ENV isp_change_xmpp_server=y
+ENV isp_change_firewall_server=y
+ENV isp_change_vserver_server=y
+ENV isp_change_db_server=y
+ENV isp_postfix_protocols=ipv4
 
-
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y update && apt-get -y upgrade && apt-get -y install quota quotatool software-properties-common quota mysql-client wget curl vim rsyslog rsyslog-relp logrotate supervisor screenfetch apt-utils gettext-base git
 
 # Remove sendmail
