@@ -187,5 +187,6 @@ RUN echo "column-statistics=0" >> /etc/mysql/conf.d/mysqldump.cnf
 
 ## FIX: Postgrey listening interface
 ADD ./etc/default/postgrey /etc/default/postgrey
+ADD ./etc/default/saslauthd /etc/default/saslauthd
 
 CMD ["/bin/bash", "/start.sh"]
