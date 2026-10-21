@@ -2,9 +2,13 @@
 
 echo $(grep $(hostname) /etc/hosts | cut -f1) localhost >> /etc/hosts
 
+# Remove regex escapes before hostname is rendered into ISPConfig and Postfix config.
+isp_hostname=${isp_hostname//\\/}
+export isp_hostname
+
 envsubst < /root/autoinstall.ini > /tmp/ispconfig3_install/install/autoinstall.ini
 
-echo $isp_hostname > /etc/mailname
+printf '%s\n' "$isp_hostname" > /etc/mailname
 
 cd /tmp/ispconfig3_install/install/
 
@@ -18,7 +22,20 @@ else
 fi
 
 # Postfix requires a literal hostname; ISPConfig's {myhostname} token is regex-escaped.
-postconf -e "myhostname = ${isp_hostname}"
+postconf -c /etc/postfix -e "myhostname = ${isp_hostname}"
+configured_myhostname=$(postconf -c /etc/postfix -h myhostname)
+if [ "$configured_myhostname" != "$isp_hostname" ]; then
+  echo "Postfix main.cf myhostname mismatch: expected '$isp_hostname', got '$configured_myhostname'" >&2
+  exit 1
+fi
+
+# Amavis listens for SMTP on 10024; use its SMTP master service, not LMTP.
+postconf -c /etc/postfix -e "content_filter = amavis:[127.0.0.1]:10024"
+configured_content_filter=$(postconf -c /etc/postfix -h content_filter)
+if [ "$configured_content_filter" != "amavis:[127.0.0.1]:10024" ]; then
+  echo "Postfix main.cf content_filter mismatch: got '$configured_content_filter'" >&2
+  exit 1
+fi
 
 # Fix from amavis ownerchip that prevents amavis to start
 chown -R amavis: /var/lib/amavis/
@@ -115,6 +132,5 @@ else
     /do-1st-backup.sh &
 fi
 
-/etc/init.d/postgrey start
-
+# Postgrey is started by its Supervisor program; do not launch it twice.
 /usr/bin/supervisord -c /etc/supervisor/supervisord.conf

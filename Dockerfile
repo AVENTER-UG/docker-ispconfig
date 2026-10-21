@@ -180,6 +180,8 @@ ADD ./wait-for-it.sh /wait-for-it.sh
 ADD ./autoinstall.ini /root/autoinstall.ini
 ADD ./start.sh /start.sh
 ADD ./supervisord.conf /etc/supervisor/supervisord.conf
+# Courier's SSL init alias starts the same all-listener service; keep only one Supervisor launcher.
+RUN python3 -c 'from pathlib import Path; import re; p=Path("/etc/supervisor/supervisord.conf"); s=p.read_text(); s,n=re.subn(r"(?ms)^\[program:courier-imap-ssl\]\n.*?(?=^\[|\Z)", "", s); assert n == 1, "duplicate Courier SSL Supervisor section not found"; p.write_text(s)'
 ADD ./etc/rsyslog/rsyslog.conf /etc/rsyslog.conf
 ADD ./etc/cron.daily/sql_backup.sh /etc/cron.daily/sql_backup.sh
 
@@ -193,6 +195,7 @@ RUN mkdir -p /tmp/ispconfig3_install/server/conf-custom/install && \
     printf '%s\n' \
         'smtpd_client_restrictions = check_client_access proxy:mysql:/etc/postfix/mysql-virtual_client.cf, permit_inet_interfaces, permit_mynetworks, permit_sasl_authenticated, reject_rbl_client zen.spamhaus.org, reject_rbl_client b.barracudacentral.org, reject_unauth_pipelining ,reject_unknown_client_hostname, check_client_access hash:/etc/letsencrypt/client_checks, permit' \
         'inet_protocols = ipv4' \
+        'content_filter = amavis:[127.0.0.1]:10024' \
         'smtpd_reject_unlisted_sender = yes' \
         'maildrop_destination_recipient_limit = 1' \
 		'message_size_limit = 52428800' \
