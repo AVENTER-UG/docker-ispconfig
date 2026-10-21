@@ -1,7 +1,7 @@
 #Dockerfile vars
 
 #vars
-TAG=v3.2.12-1
+TAG=v3.2.12-1-noble
 IMAGENAME=docker-ispconfig
 IMAGEFULLNAME=avhost/${IMAGENAME}
 BRANCH=${TAG}
@@ -26,9 +26,9 @@ build:
 push:
 	@echo ">>>> Publish docker image: " ${TAG}_${BUILDDATE}
 	-docker buildx create --use --name buildkit
-	@docker buildx build --push --sbom=true --provenance=true --no-cache=true --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${TAG}_${BUILDDATE} .
-	@docker buildx build --push --sbom=true --provenance=true --no-cache=true --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${TAG} .
-	@docker buildx build --push --sbom=true --provenance=true --no-cache=true --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
+	@docker buildx build --push --sbom=true --provenance=true --no-cache=false --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${TAG}_${BUILDDATE} .
+	@docker buildx build --push --sbom=true --provenance=true --no-cache=false --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${TAG} .
+	@docker buildx build --push --sbom=true --provenance=true --no-cache=false --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
 	-docker buildx rm buildkit
 
 seccheck:

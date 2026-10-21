@@ -17,14 +17,23 @@ else
 	/wait-for-it.sh $isp_mysql_hostname:$isp_mysql_port -- php -q install.php --autoinstall=/tmp/ispconfig3_install/install/autoinstall.ini
 fi
 
+# Postfix requires a literal hostname; ISPConfig's {myhostname} token is regex-escaped.
+postconf -e "myhostname = ${isp_hostname}"
+
 # Fix from amavis ownerchip that prevents amavis to start
 chown -R amavis: /var/lib/amavis/
 
+# Create dedicated Amavis override file for ISPConfig
+# This creates /etc/amavis/conf.d/99-ispconfig-local which loads after 50-user
+cat > /etc/amavis/conf.d/99-ispconfig-local << 'EOF'
+$max_servers = 1;
+$max_requests = 20;
+$inet_socket_bind = '127.0.0.1';
+EOF
+
 #sed -i "s/^hosts .*$/hosts = $isp_mysql_hostname/g" /etc/postfix/mysql-virtual_outgoing_bcc.cf
-sed -i "s/^myhostname = .*$/myhostname = $isp_hostname/g" /etc/postfix/main.cf
-echo message_size_limit=52428800 >> /etc/postfix/main.cf
-sed -i "s/^inet_protocols = .*$/inet_protocols = $isp_postfix_protocols/g" /etc/postfix/main.cf
 sed -i "s/, check_policy_service unix:private\/quota-status$//g" /etc/postfix/main.cf
+
 
 #echo "UPDATE mysql.user SET Host = '%' WHERE User like 'ispc%';" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
 #echo "UPDATE mysql.db SET Host = '%' WHERE User like 'ispc%';" | mysql -u root -h$isp_mysql_hostname -p$isp_mysql_root_password
@@ -40,8 +49,19 @@ envsubst < /root/authmysqlrc.ini > /etc/courier/authmysqlrc
 # configure phpmyadmin
 envsubst < /root/phpmyadmin.ini > /etc/phpmyadmin/config.inc.php
 
-mkdir -p /etc/courier/shared/index
-chmod -R 770 /etc/courier/shared
+# Courier's shared index is a regular file, not a directory.
+mkdir -p /etc/courier/shared
+if [ -d /etc/courier/shared/index ]; then
+  rmdir /etc/courier/shared/index || {
+    echo "Courier shared index path is a non-empty directory; refusing to remove it" >&2
+    exit 1
+  }
+fi
+if [ ! -e /etc/courier/shared/index ]; then
+  install -m 0644 /dev/null /etc/courier/shared/index
+fi
+find /etc/courier/shared -type d -exec chmod 0755 {} +
+find /etc/courier/shared -type f -exec chmod 0644 {} +
 
 rm -rf /var/run/saslauthd
 ln -sfn /var/spool/postfix/var/run/saslauthd /var/run/saslauthd
@@ -62,12 +82,12 @@ fi
 
 if [ "$isp_enable_nginx" == "y" ];
 then
-  /etc/init.d/php7.4-fpm start
+  /etc/init.d/php8.3-fpm start
 fi
 
 if [ "$isp_enable_apache" == "y" ];
 then
-  /etc/init.d/php7.4-fpm start
+  /etc/init.d/php8.3-fpm start
 fi
 
 if [ "$isp_enable_jailkit" == "y" ];

@@ -369,7 +369,7 @@ $conf['services']['db'] = check_service_config_state('db_server', true); /* Will
 unset($current_svc_config);
 
 //** Write new decisions into DB
-$sql = "UPDATE ?? SET mail_server = '{$conf['services']['mail']}', web_server = '{$conf['services']['web']}', dns_server = '{$conf['services']['dns']}', file_server = '{$conf['services']['file']}', db_server = '{$conf['services']['db']}', vserver_server = '{$conf['services']['vserver']}', proxy_server = '{$conf['services']['proxy']}', firewall_server = '$firewall_server_enabled', xmpp_server = '$xmpp_server_enabled' WHERE server_id = ?";
+$sql = "UPDATE ?? SET mail_server = '{$conf['services']['mail']}', web_server = '{$conf['services']['web']}', dns_server = '{$conf['services']['dns']}', file_server = '{$conf['services']['file']}', db_server = '{$conf['services']['db']}', vserver_server = '{$conf['services']['vserver']}', proxy_server = '{$conf['services']['proxy']}', firewall_server = '{$conf['services']['firewall']}', xmpp_server = '{$conf['services']['xmpp']}' WHERE server_id = ?";
 $inst->db->query($sql, $conf['mysql']['database'].'.server', $conf['server_id']);
 if($conf['mysql']['master_slave_setup'] == 'y') {
 	$inst->dbmaster->query($sql, $conf['mysql']['master_database'].'.server', $conf['server_id']);
@@ -562,7 +562,7 @@ if($conf['apache']['installed'] == true) {
 if ($inst->install_ispconfig_interface) {
 	//** Customise the port ISPConfig runs on
 	$ispconfig_port_number = get_ispconfig_port_number();
-	if($autoupdate['ispconfig_port'] == 'default') $autoupdate['ispconfig_port'] = $ispconfig_port_number;
+	if(isset($autoinstall['ispconfig_port']) && $autoinstall['ispconfig_port'] == 'default') $autoinstall['ispconfig_port'] = $ispconfig_port_number;
 	if($conf['webserver']['server_type'] == 'nginx'){
 		$conf['nginx']['vhost_port'] = $inst->free_query('ISPConfig Port', $ispconfig_port_number,'ispconfig_port');
 	} else {
